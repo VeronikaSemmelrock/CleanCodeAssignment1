@@ -1,3 +1,5 @@
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +24,7 @@ public class WebCrawlerConfiguration {
 
             if(isValidURL(url) && isValidDepth(depth) && isValidLanguage(language)){
                 return true;
-            };
+            }
         }
         return false;
     }
@@ -42,13 +44,28 @@ public class WebCrawlerConfiguration {
     }
 
     private static boolean isValidURL(String url) {
-        Pattern pattern = Pattern.compile("^(http:\\/\\/|https:\\/\\/)?(www.)?([a-zA-Z0-9]+).[a-zA-Z0-9]*.[a-z]{3}.?([a-z]+)?$");
+        Pattern pattern = Pattern.compile("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
         Matcher matcher = pattern.matcher(url);
         if(matcher.matches()){
             return true;
         }else{
             return false;
         }
+    }
+
+    public Set<WebCrawlerConfiguration> fromUrls(Set<String> urls) {
+        Set<WebCrawlerConfiguration> nestedWebCrawlerConfigurations = new HashSet<>();
+        for (String url : urls) {
+            String[] configuration = new String[3];
+            configuration[0] = url;
+            configuration[1] = depth - 1 + "";
+            configuration[2] = language;
+            if (isValidConfiguration(configuration)) {
+                WebCrawlerConfiguration nestedWebCrawlerConfiguration = new WebCrawlerConfiguration(configuration);
+                nestedWebCrawlerConfigurations.add(nestedWebCrawlerConfiguration);
+            }
+        }
+        return nestedWebCrawlerConfigurations;
     }
 
     public String getUrl() {
