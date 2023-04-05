@@ -10,7 +10,7 @@ public class WebCrawlerConfiguration {
 
 
     public WebCrawlerConfiguration(String[] configuration) throws IllegalArgumentException{
-        //is it unclean if someone can call the constructor without executing the check first
+        //is it unclean if someone can call the constructor without executing the check first - TODO clean?
         this.url = configuration[0];
         this.depth = Integer.parseInt(configuration[1]);
         this.language = configuration[2];
@@ -29,9 +29,8 @@ public class WebCrawlerConfiguration {
         return false;
     }
 
-    private static boolean isValidLanguage(String language) {
-        //???? - via API?
-        return true;
+    private static boolean isValidLanguage(String language) {//TODO clean?
+        return Translator.isValidLanguage(language);
     }
 
     private static boolean isValidDepth(String depth) {
@@ -53,7 +52,7 @@ public class WebCrawlerConfiguration {
         }
     }
 
-    public Set<WebCrawlerConfiguration> fromUrls(Set<String> urls) {
+    public Set<WebCrawlerConfiguration> fromUrls(Set<String> urls) {//TODO remove?
         Set<WebCrawlerConfiguration> nestedWebCrawlerConfigurations = new HashSet<>();
         for (String url : urls) {
             String[] configuration = new String[3];

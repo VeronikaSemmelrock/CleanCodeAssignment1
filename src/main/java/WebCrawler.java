@@ -1,6 +1,8 @@
+import okhttp3.*;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
@@ -58,9 +60,20 @@ public class WebCrawler {
         return null;
     }
 
-    private Elements translateHeadings(Elements headings) {
-        // TODO
-        return headings;
+    private Elements translateHeadings(Elements headings){
+        System.out.println("Happens with -> "+headings);
+        Elements translatedHeadings = new Elements();
+        try{
+            for(Element heading : headings){
+                Element translatedHeading = heading.html(Translator.translate(heading.ownText(), rootConfiguration.getLanguage()));
+                translatedHeadings.add(translatedHeading);
+            }
+        }catch(Exception e){
+            System.out.println(e);
+            System.out.println("Something went wrong trying to translate the headings. The headings will be written to the file without translation!");
+            return headings;
+        }
+        return translatedHeadings;
     }
 
     private void saveResult(WebCrawlerResult result, WebCrawlerConfiguration configuration) {
