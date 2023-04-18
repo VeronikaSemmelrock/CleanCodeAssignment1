@@ -6,14 +6,10 @@ public class WebCrawlerResult {
 
     private final WebCrawlerConfiguration webCrawlerConfiguration;
 
-    private Elements headings;
-    private Set<String> links;
+    private final Elements headings;
 
-    public WebCrawlerResult(WebCrawlerConfiguration webCrawlerConfiguration) {
-        this.webCrawlerConfiguration = webCrawlerConfiguration;
-    }
-
-    public void setHeadings(Elements headings) {
+    public WebCrawlerResult(WebCrawlerConfiguration configuration, Elements headings, Set<String> links) {
+        this.webCrawlerConfiguration = configuration;
         this.headings = headings;
     }
 
@@ -25,11 +21,4 @@ public class WebCrawlerResult {
         return headings;
     }
 
-    public Set<String> getLinks() {
-        return links;
-    }
-
-    public void setLinks(Set<String> links) {
-        this.links = links;
-    }
 }

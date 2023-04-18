@@ -21,4 +21,12 @@ public class Website {
         Set<String> links = linkElements.stream().map(element -> element.attr("href")).collect(Collectors.toSet());
         return links;
     }
+
+    public String getSourceLanguage() {
+        String sourceLanguage = document.select("html").attr("lang");
+        if (sourceLanguage.equals("") || sourceLanguage == null) {
+            sourceLanguage = "undetectable";
+        }
+        return sourceLanguage;
+    }
 }

@@ -3,15 +3,16 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Translator {
 
-    private final static HashMap<String, String> languagesWithAbbreviations = createLanguagesWithAbbreviations();
+    private final static Map<String, String> languagesWithAbbreviations = createLanguagesWithAbbreviations();
     private final static String KEY = "912f56a493mshdfe86a65df38831p15e096jsn4be7a86cbe38";
     private static OkHttpClient client = new OkHttpClient();
 
-    private static HashMap createLanguagesWithAbbreviations(){
-        HashMap languagesWithAbbreviations = new HashMap<String, String>();
+    private static Map<String, String> createLanguagesWithAbbreviations() {
+        Map<String, String> languagesWithAbbreviations = new HashMap<>();
         languagesWithAbbreviations.put("afrikaans", "af");
         languagesWithAbbreviations.put("albanian", "sq");
         languagesWithAbbreviations.put("amharic", "am");
@@ -59,29 +60,30 @@ public class Translator {
         return languagesWithAbbreviations;
     }
 
-    public static boolean isValidLanguage(String language){
+    public static boolean isValidLanguage(String language) {
         return languagesWithAbbreviations.containsKey(language.toLowerCase());
     }
 
-    public static String getAbbreviationOfLanguage(String language){
+    public static String getAbbreviationOfLanguage(String language) {
         String abbreviation = languagesWithAbbreviations.get(language.toLowerCase());
-        if(abbreviation == null){
+        if (abbreviation == null) {
             throw new IllegalArgumentException();
         }
         return abbreviation;
     }
 
     public static String translate(String text, String targetLanguage) throws IllegalArgumentException, IOException, TranslatorAPINetworkException {
-            RequestBody requestBody = createRequestBody(text, targetLanguage);
-            Request request = createRequest(requestBody);
-            Response response = client.newCall(request).execute();
+        RequestBody requestBody = createRequestBody(text, targetLanguage);
+        Request request = createRequest(requestBody);
+        Response response = client.newCall(request).execute();
 
-            if (response.isSuccessful()) {
-                JSONObject responseBody = new JSONObject(response.body().string());
-                return responseBody.getJSONObject("data").getString("translatedText");
-            }else{
-                throw new TranslatorAPINetworkException("Translation did not work!");
-            }
+        if (response.isSuccessful()) {
+            JSONObject responseBody = new JSONObject(response.body().string());
+            String translatedText = responseBody.getJSONObject("data").getString("translatedText");
+            return translatedText;
+        } else {
+            throw new TranslatorAPINetworkException("Translation did not work!");
+        }
     }
 
     private static Request createRequest(RequestBody requestBody) {
@@ -94,8 +96,8 @@ public class Translator {
                 .build();
     }
 
-    private static RequestBody createRequestBody(String text, String targetLanguage) throws IllegalArgumentException{
-        if(text == null){
+    private static RequestBody createRequestBody(String text, String targetLanguage) throws IllegalArgumentException {
+        if (text == null) {
             throw new IllegalArgumentException();
         }
         String abbreviation = getAbbreviationOfLanguage(targetLanguage);
