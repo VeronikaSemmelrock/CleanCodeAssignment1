@@ -13,7 +13,12 @@ public class Website {
     }
 
     public Elements getHeadings() {
-        return document.select("h1,h2,h3,h4,h5,h6");
+        Elements headings = document.select("h1,h2,h3,h4,h5,h6");
+        return filterBlankHeadings(headings);
+    }
+
+    private Elements filterBlankHeadings(Elements headings) {
+        return headings.stream().filter(heading -> !heading.ownText().isBlank()).collect(Collectors.toCollection(Elements::new));
     }
 
     public Set<String> getLinks() {
@@ -24,7 +29,7 @@ public class Website {
 
     public String getSourceLanguage() {
         String sourceLanguage = document.select("html").attr("lang");
-        if (sourceLanguage.equals("") || sourceLanguage == null) {
+        if (sourceLanguage == null || sourceLanguage.equals("")) {
             sourceLanguage = "undetectable";
         }
         return sourceLanguage;

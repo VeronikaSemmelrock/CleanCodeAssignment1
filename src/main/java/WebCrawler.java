@@ -65,7 +65,7 @@ public class WebCrawler {
     }
 
     private Elements translateHeadings(Elements headings) {
-        Elements translatedHeadings = headings.clone();
+        Elements translatedHeadings = new Elements();
         try {
             for (Element heading : headings) {
                 Element translatedHeading = heading.html(Translator.translate(heading.ownText(), rootConfiguration.getLanguage()));
