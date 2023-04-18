@@ -1,5 +1,3 @@
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -14,11 +12,13 @@ public class WebCrawler {
     private final Set<String> crawledLinks;
 
     private String sourceLanguage;
+    private WebsiteService websiteService;
 
     public WebCrawler(WebCrawlerConfiguration configuration) {
         this.rootConfiguration = configuration;
         this.webCrawlerFileWriter = new WebCrawlerFileWriter(new File("output.md"));
         this.crawledLinks = new HashSet<>();
+        this.websiteService = new WebsiteServiceImpl();
     }
 
     public void run() {
@@ -29,34 +29,25 @@ public class WebCrawler {
     private void crawl(WebCrawlerConfiguration configuration) {
         System.out.println("Crawling " + configuration.getUrl() + " with depth " + configuration.getDepth());
 
-        Website website = getWebsite(configuration);
+        Website website = websiteService.getWebsite(configuration);
         if (website != null) {
             if (isRootDepth(configuration)) {
                 sourceLanguage = website.getSourceLanguage();
             }
+            crawledLinks.add(configuration.getUrl());
             Elements translatedHeadings = translateHeadings(website.getHeadings());
             Set<String> links = website.getLinks();
-            WebCrawlerResult result = new WebCrawlerResult(configuration, translatedHeadings, links);
+            WebCrawlerResult result = new WebCrawlerResult(configuration, translatedHeadings);
 
             writeToFile(result, getCurrentDepth(configuration));
-            crawlLinks(links, getCurrentDepth(configuration));
+            crawlLinks(links, configuration.getDepth());
+        } else {
+            handleBrokenLink(configuration);
         }
     }
 
     private boolean isRootDepth(WebCrawlerConfiguration configuration) {
         return configuration == rootConfiguration;
-    }
-
-    private Website getWebsite(WebCrawlerConfiguration configuration) {
-        String url = configuration.getUrl();
-        crawledLinks.add(url);
-        try {
-            Document document = Jsoup.connect(url).get();
-            return new Website(document);
-        } catch (Exception e) {
-            handleBrokenLink(configuration);
-        }
-        return null;
     }
 
     private void handleBrokenLink(WebCrawlerConfiguration configuration) {
@@ -87,14 +78,14 @@ public class WebCrawler {
         }
     }
 
-    private void crawlLinks(Set<String> links, int currentDepth) {
-        if (currentDepth <= 0) {
+    private void crawlLinks(Set<String> links, int depth) {
+        if (depth <= 0) {
             return;
         }
         for (String link : links) {
             String[] configurationArgs = new String[3];
             configurationArgs[0] = link;
-            configurationArgs[1] = String.valueOf(currentDepth - 1);
+            configurationArgs[1] = String.valueOf(depth - 1);
             configurationArgs[2] = rootConfiguration.getLanguage();
             if (isUnvisitedValidLink(link, configurationArgs)) {
                 WebCrawlerConfiguration nestedConfiguration = new WebCrawlerConfiguration(configurationArgs);
@@ -110,5 +101,4 @@ public class WebCrawler {
     private boolean isUnvisitedValidLink(String link, String[] configurationArgs) {
         return !crawledLinks.contains(link) && WebCrawlerConfiguration.isValidConfiguration(configurationArgs);
     }
-
 }

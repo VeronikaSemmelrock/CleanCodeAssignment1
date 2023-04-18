@@ -31,7 +31,7 @@ public class WebCrawlerFileWriter {
         WebCrawlerConfiguration webCrawlerConfiguration = nestedWebCrawlerResult.getWebCrawlerConfiguration();
         String crawledUrl = webCrawlerConfiguration.getUrl();
         StringBuilder markdownCrawledUrl = new StringBuilder();
-        markdownCrawledUrl.append("<br>");
+        markdownCrawledUrl.append("\n<br>");
         markdownCrawledUrl.append(getArrowRepresentationOfDepth(depth));
         markdownCrawledUrl.append(" link to <a>");
         markdownCrawledUrl.append(crawledUrl);
@@ -45,13 +45,12 @@ public class WebCrawlerFileWriter {
         for (Element heading : headings) {
             outputFileContent.append(toMarkDownHeading(heading, depth));
         }
-        outputFileContent.append("\n");
     }
 
     public void writeBrokenLinkReport(WebCrawlerConfiguration configuration, int depth) {
         StringBuilder brokenLink = new StringBuilder();
         brokenLink.append(getArrowRepresentationOfDepth(depth));
-        brokenLink.append(" broken link<a>" + configuration.getUrl() + "</a>\n");
+        brokenLink.append(" broken link <a>" + configuration.getUrl() + "</a>\n");
         outputFileContent.append(brokenLink);
     }
 

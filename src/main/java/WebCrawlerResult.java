@@ -1,14 +1,11 @@
 import org.jsoup.select.Elements;
 
-import java.util.Set;
-
 public class WebCrawlerResult {
 
     private final WebCrawlerConfiguration webCrawlerConfiguration;
-
     private final Elements headings;
 
-    public WebCrawlerResult(WebCrawlerConfiguration configuration, Elements headings, Set<String> links) {
+    public WebCrawlerResult(WebCrawlerConfiguration configuration, Elements headings) {
         this.webCrawlerConfiguration = configuration;
         this.headings = headings;
     }
