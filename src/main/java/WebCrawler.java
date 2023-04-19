@@ -38,7 +38,7 @@ public class WebCrawler {
             Elements translatedHeadings = translateHeadings(website.getHeadings());
             Set<String> links = website.getLinks();
             WebCrawlerResult result = new WebCrawlerResult(configuration, translatedHeadings);
-
+            if (configuration.getDepth() == 0) System.out.println(links);
             writeToFile(result, getCurrentDepth(configuration));
             crawlLinks(links, configuration.getDepth());
         } else {
@@ -100,5 +100,9 @@ public class WebCrawler {
 
     private boolean isUnvisitedValidLink(String link, String[] configurationArgs) {
         return !crawledLinks.contains(link) && WebCrawlerConfiguration.isValidConfiguration(configurationArgs);
+    }
+
+    public void setWebsiteService(WebsiteService websiteService) {
+        this.websiteService = websiteService;
     }
 }

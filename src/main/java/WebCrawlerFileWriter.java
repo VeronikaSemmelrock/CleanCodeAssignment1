@@ -49,6 +49,7 @@ public class WebCrawlerFileWriter {
 
     public void writeBrokenLinkReport(WebCrawlerConfiguration configuration, int depth) {
         StringBuilder brokenLink = new StringBuilder();
+        brokenLink.append("\n");
         brokenLink.append(getArrowRepresentationOfDepth(depth));
         brokenLink.append(" broken link <a>" + configuration.getUrl() + "</a>\n");
         outputFileContent.append(brokenLink);
@@ -86,5 +87,4 @@ public class WebCrawlerFileWriter {
 
         return arrow.toString();
     }
-
 }
