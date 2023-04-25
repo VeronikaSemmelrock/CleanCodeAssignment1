@@ -44,7 +44,7 @@ class WebCrawlerTest {
 
         String outputFileContent = Files.readString(Path.of(OUTPUT_FILE_NAME));
         String expectedFileContent = """
-                
+                                
                 \sbroken link <a>https://www.aau.at</a>
                 """;
         assertEquals(expectedFileContent, outputFileContent);
@@ -105,12 +105,12 @@ class WebCrawlerTest {
                 #### h4 Heading
                 ##### h5 Heading
                 ###### h6 Heading
-                
+                                
                 <br>--> link to <a>https://campus.aau.at/</a>
                 ####--> h4 Heading in nested Link
                 #--> h1 Heading in nested Link
                 ##--> h2 Heading in nested Link
-                
+                                
                 --> broken link <a>https://www.google.at/</a>
                 """;
         assertEquals(expectedFileContent, outputFileContent);

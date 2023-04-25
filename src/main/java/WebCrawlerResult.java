@@ -1,7 +1,6 @@
 import org.jsoup.select.Elements;
 
 public class WebCrawlerResult {
-
     private final WebCrawlerConfiguration webCrawlerConfiguration;
     private final Elements headings;
 

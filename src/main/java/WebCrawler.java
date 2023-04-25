@@ -11,6 +11,8 @@ public class WebCrawler {
     private final WebCrawlerFileWriter webCrawlerFileWriter;
     private final Set<String> crawledLinks;
 
+    private Translator translator;
+
     private String sourceLanguage;
     private WebsiteService websiteService;
 
@@ -19,6 +21,7 @@ public class WebCrawler {
         this.webCrawlerFileWriter = new WebCrawlerFileWriter(new File("output.md"));
         this.crawledLinks = new HashSet<>();
         this.websiteService = new WebsiteServiceImpl();
+        this.translator = new Translator();
     }
 
     public void run() {
@@ -59,7 +62,7 @@ public class WebCrawler {
         Elements translatedHeadings = new Elements();
         try {
             for (Element heading : headings) {
-                Element translatedHeading = heading.html(Translator.translate(heading.ownText(), rootConfiguration.getLanguage()));
+                Element translatedHeading = heading.html(translator.translate(heading.ownText(), rootConfiguration.getLanguage()));
                 translatedHeadings.add(translatedHeading);
             }
         } catch (Exception e) {
@@ -104,5 +107,9 @@ public class WebCrawler {
 
     public void setWebsiteService(WebsiteService websiteService) {
         this.websiteService = websiteService;
+    }
+
+    public void setTranslator(Translator translator) {
+        this.translator = translator;
     }
 }

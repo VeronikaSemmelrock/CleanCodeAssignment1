@@ -82,7 +82,7 @@ class WebCrawlerFileWriterTest {
         webCrawlerFileWriter.flush();
 
         String expected = """
-                
+                                
                 ------> broken link <a>url</a>
                 """;
 

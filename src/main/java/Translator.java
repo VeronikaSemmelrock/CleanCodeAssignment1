@@ -9,7 +9,7 @@ public class Translator {
 
     private final static Map<String, String> languagesWithAbbreviations = createLanguagesWithAbbreviations();
     private final static String KEY = "8add8089dfmsh39f77e11496092bp149c84jsn9c1e220cd5af";
-    private static OkHttpClient client = new OkHttpClient();
+    private OkHttpClient client = new OkHttpClient();
 
     private static Map<String, String> createLanguagesWithAbbreviations() {
         Map<String, String> languagesWithAbbreviations = new HashMap<>();
@@ -72,7 +72,7 @@ public class Translator {
         return abbreviation;
     }
 
-    public static String translate(String text, String targetLanguage) throws IllegalArgumentException, IOException, TranslatorAPINetworkException {
+    public String translate(String text, String targetLanguage) throws IllegalArgumentException, IOException, TranslatorAPINetworkException {
         RequestBody requestBody = createRequestBody(text, targetLanguage);
         Request request = createRequest(requestBody);
         Response response = client.newCall(request).execute();
@@ -86,7 +86,7 @@ public class Translator {
         }
     }
 
-    private static Request createRequest(RequestBody requestBody) {
+    private Request createRequest(RequestBody requestBody) {
         return new Request.Builder()
                 .url("https://text-translator2.p.rapidapi.com/translate")
                 .post(requestBody)
@@ -96,7 +96,7 @@ public class Translator {
                 .build();
     }
 
-    private static RequestBody createRequestBody(String text, String targetLanguage) throws IllegalArgumentException {
+    private RequestBody createRequestBody(String text, String targetLanguage) throws IllegalArgumentException {
         if (text == null) {
             throw new IllegalArgumentException();
         }
@@ -106,5 +106,9 @@ public class Translator {
                 .add("target_language", abbreviation)
                 .add("text", text)
                 .build();
+    }
+
+    public void setClient(OkHttpClient client) {
+        this.client = client;
     }
 }
