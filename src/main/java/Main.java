@@ -9,6 +9,7 @@ public class Main {
         String validUserInput = getValidInputViaUserInteraction(scanner.nextLine());
         WebCrawler webCrawler = new WebCrawler(new WebCrawlerConfiguration(validUserInput.split(";")));
         webCrawler.run();
+        scanner.close();
     }
 
     private static String getValidInputViaUserInteraction(String userInput) {
