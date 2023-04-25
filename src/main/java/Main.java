@@ -8,7 +8,7 @@ public class Main {
                 "Please enter the arguments in the format {URL};{depth};{targetLanguage}");
         String validUserInput = getValidInputViaUserInteraction(scanner.nextLine());
         WebCrawler webCrawler = new WebCrawler(new WebCrawlerConfiguration(validUserInput.split(";")));
-        //webCrawler.run();
+        webCrawler.run();
     }
 
     private static String getValidInputViaUserInteraction(String userInput) {
