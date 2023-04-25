@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class WebCrawlerTest {
 
     @Mock
-    private WebsiteService websiteService;
+    private WebsiteService mockedWebsiteService;
 
     @InjectMocks
     private WebCrawler webCrawler;
@@ -30,15 +30,19 @@ class WebCrawlerTest {
     private final static String OUTPUT_FILE_NAME = "output.md";
 
     @BeforeEach
-    void setup() throws IOException {
+    void setup() throws IOException, TranslatorAPINetworkException {
         webCrawler = new WebCrawler(configuration);
         MockitoAnnotations.openMocks(this);
         Files.deleteIfExists(Path.of(OUTPUT_FILE_NAME));
+
+        Translator mockedTranslator = Mockito.mock(Translator.class);
+        Mockito.when(mockedTranslator.translate(Mockito.anyString(), Mockito.anyString())).thenAnswer(i -> i.getArguments()[0]);
+        webCrawler.setTranslator(mockedTranslator);
     }
 
     @Test
-    void crawlRootDeadLinkTest() throws IOException {
-        Mockito.when(websiteService.getWebsite(Mockito.any())).thenReturn(null);
+    void crawlRootIsDeadLinkTest() throws IOException {
+        Mockito.when(mockedWebsiteService.getWebsite(Mockito.any(WebCrawlerConfiguration.class))).thenReturn(null);
 
         webCrawler.run();
 
@@ -53,7 +57,7 @@ class WebCrawlerTest {
     @Test
     void crawlWith0DepthTest() throws IOException {
         Website website = getWebsite("rootWebsiteForCrawlTest.html");
-        Mockito.when(websiteService.getWebsite(Mockito.any())).thenReturn(website);
+        Mockito.when(mockedWebsiteService.getWebsite(Mockito.any(WebCrawlerConfiguration.class))).thenReturn(website);
 
         webCrawler.run();
 
@@ -79,14 +83,14 @@ class WebCrawlerTest {
         String[] args = new String[]{"https://www.aau.at", "1", "english"};
         WebCrawlerConfiguration configuration = new WebCrawlerConfiguration(args);
         webCrawler = new WebCrawler(configuration);
-        websiteService = Mockito.mock(WebsiteService.class);
-        webCrawler.setWebsiteService(websiteService);
+        mockedWebsiteService = Mockito.mock(WebsiteService.class);
+        webCrawler.setWebsiteService(mockedWebsiteService);
 
-        Website rootwebsite = getWebsite("rootWebsiteForCrawlTest.html");
+        Website rootWebsite = getWebsite("rootWebsiteForCrawlTest.html");
         Website nestedWebsite = getWebsite("nestedWebsiteForCrawlTest.html");
 
-        Mockito.when(websiteService.getWebsite(Mockito.any()))
-                .thenReturn(rootwebsite)
+        Mockito.when(mockedWebsiteService.getWebsite(Mockito.any(WebCrawlerConfiguration.class)))
+                .thenReturn(rootWebsite)
                 .thenReturn(nestedWebsite)
                 .thenReturn(null);
 
