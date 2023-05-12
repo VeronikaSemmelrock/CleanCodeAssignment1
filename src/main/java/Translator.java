@@ -73,8 +73,8 @@ public class Translator {
     }
 
     public String translate(String text, String targetLanguage) throws IllegalArgumentException, IOException, TranslatorAPINetworkException {
-        RequestBody requestBody = createRequestBody(text, targetLanguage);
-        Request request = createRequest(requestBody);
+        RequestBody requestBody = createTranslationRequestBody(text, targetLanguage);
+        Request request = createTranslationRequest(requestBody);
         Response response = client.newCall(request).execute();
 
         if (response.isSuccessful()) {
@@ -86,7 +86,7 @@ public class Translator {
         }
     }
 
-    private Request createRequest(RequestBody requestBody) {
+    private Request createTranslationRequest(RequestBody requestBody) {
         return new Request.Builder()
                 .url("https://text-translator2.p.rapidapi.com/translate")
                 .post(requestBody)
@@ -96,7 +96,7 @@ public class Translator {
                 .build();
     }
 
-    private RequestBody createRequestBody(String text, String targetLanguage) throws IllegalArgumentException {
+    private RequestBody createTranslationRequestBody(String text, String targetLanguage) throws IllegalArgumentException {
         if (text == null) {
             throw new IllegalArgumentException();
         }

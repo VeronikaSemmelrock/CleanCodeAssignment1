@@ -25,37 +25,36 @@ public class WebCrawler {
     }
 
     public void run() {
-        crawl(rootConfiguration);
+        crawlConfiguration(rootConfiguration);
         webCrawlerFileWriter.flush();
     }
 
-    private void crawl(WebCrawlerConfiguration configuration) {
+    private void crawlConfiguration(WebCrawlerConfiguration configuration) {
         System.out.println("Crawling " + configuration.getUrl() + " with depth " + configuration.getDepth());
 
         Website website = websiteService.getWebsite(configuration);
         if (website != null) {
-            if (isRootDepth(configuration)) {
+            if (isRootConfiguration(configuration)) {
                 sourceLanguage = website.getSourceLanguage();
             }
             crawledLinks.add(configuration.getUrl());
             Elements translatedHeadings = translateHeadings(website.getHeadings());
             Set<String> links = website.getLinks();
             WebCrawlerResult result = new WebCrawlerResult(configuration, translatedHeadings);
-            if (configuration.getDepth() == 0) System.out.println(links);
-            writeToFile(result, getCurrentDepth(configuration));
+            writeCrawlerResultToFileAtDepth(result, getCurrentDepth(configuration));
             crawlLinks(links, configuration.getDepth());
         } else {
             handleBrokenLink(configuration);
         }
     }
 
-    private boolean isRootDepth(WebCrawlerConfiguration configuration) {
+    private boolean isRootConfiguration(WebCrawlerConfiguration configuration) {
         return configuration == rootConfiguration;
     }
 
     private void handleBrokenLink(WebCrawlerConfiguration configuration) {
         int currentDepth = getCurrentDepth(configuration);
-        webCrawlerFileWriter.writeBrokenLinkReport(configuration, currentDepth);
+        webCrawlerFileWriter.writeCrawlerResultBrokenLinkToFileAtDepth(configuration, currentDepth);
     }
 
     private Elements translateHeadings(Elements headings) {
@@ -73,11 +72,11 @@ public class WebCrawler {
         return translatedHeadings;
     }
 
-    private void writeToFile(WebCrawlerResult result, int currentDepth) {
+    private void writeCrawlerResultToFileAtDepth(WebCrawlerResult result, int currentDepth) {
         if (currentDepth == 0) {
-            webCrawlerFileWriter.writeBaseReport(result, sourceLanguage);
+            webCrawlerFileWriter.writeCrawlerResultToFileAsBaseReport(result, sourceLanguage);
         } else {
-            webCrawlerFileWriter.writeNestedReport(result, currentDepth);
+            webCrawlerFileWriter.writeCrawlerResultToFileAsNestedReport(result, currentDepth);
         }
     }
 
@@ -92,7 +91,7 @@ public class WebCrawler {
             configurationArgs[2] = rootConfiguration.getLanguage();
             if (isUnvisitedValidLink(link, configurationArgs)) {
                 WebCrawlerConfiguration nestedConfiguration = new WebCrawlerConfiguration(configurationArgs);
-                crawl(nestedConfiguration);
+                crawlConfiguration(nestedConfiguration);
             }
         }
     }

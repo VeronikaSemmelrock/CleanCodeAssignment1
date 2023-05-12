@@ -14,7 +14,7 @@ public class WebCrawlerFileWriter {
         this.outputFile = outputFile;
     }
 
-    public void writeBaseReport(WebCrawlerResult webCrawlerResult, String sourceLanguage) {
+    public void writeCrawlerResultToFileAsBaseReport(WebCrawlerResult webCrawlerResult, String sourceLanguage) {
         WebCrawlerConfiguration webCrawlerConfiguration = webCrawlerResult.getWebCrawlerConfiguration();
         StringBuilder baseReport = new StringBuilder();
         baseReport.append("input: <a>" + webCrawlerConfiguration.getUrl() + "</a>\n");
@@ -24,10 +24,10 @@ public class WebCrawlerFileWriter {
         baseReport.append("<br>summary:" + "\n");
 
         outputFileContent.append(baseReport);
-        appendReportHeadings(webCrawlerResult, 0);
+        appendCrawlerResultHeadingsToFileAtDepth(webCrawlerResult, 0);
     }
 
-    public void writeNestedReport(WebCrawlerResult nestedWebCrawlerResult, int depth) {
+    public void writeCrawlerResultToFileAsNestedReport(WebCrawlerResult nestedWebCrawlerResult, int depth) {
         WebCrawlerConfiguration webCrawlerConfiguration = nestedWebCrawlerResult.getWebCrawlerConfiguration();
         String crawledUrl = webCrawlerConfiguration.getUrl();
         StringBuilder markdownCrawledUrl = new StringBuilder();
@@ -37,17 +37,17 @@ public class WebCrawlerFileWriter {
         markdownCrawledUrl.append(crawledUrl);
         markdownCrawledUrl.append("</a>\n");
         outputFileContent.append(markdownCrawledUrl);
-        appendReportHeadings(nestedWebCrawlerResult, depth);
+        appendCrawlerResultHeadingsToFileAtDepth(nestedWebCrawlerResult, depth);
     }
 
-    private void appendReportHeadings(WebCrawlerResult webCrawlerResult, int depth) {
+    private void appendCrawlerResultHeadingsToFileAtDepth(WebCrawlerResult webCrawlerResult, int depth) {
         Elements headings = webCrawlerResult.getHeadings();
         for (Element heading : headings) {
-            outputFileContent.append(toMarkDownHeading(heading, depth));
+            outputFileContent.append(headingToMarkDownHeadingWithDepth(heading, depth));
         }
     }
 
-    public void writeBrokenLinkReport(WebCrawlerConfiguration configuration, int depth) {
+    public void writeCrawlerResultBrokenLinkToFileAtDepth(WebCrawlerConfiguration configuration, int depth) {
         StringBuilder brokenLink = new StringBuilder();
         brokenLink.append("\n");
         brokenLink.append(getArrowRepresentationOfDepth(depth));
@@ -55,7 +55,7 @@ public class WebCrawlerFileWriter {
         outputFileContent.append(brokenLink);
     }
 
-    private String toMarkDownHeading(Element heading, int depth) {
+    private String headingToMarkDownHeadingWithDepth(Element heading, int depth) {
         StringBuilder markdownHeading = new StringBuilder();
         int headingLevel = Integer.parseInt(heading.tagName().substring(1));
         for (int i = 0; i < headingLevel; i++) {

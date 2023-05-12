@@ -30,7 +30,7 @@ class WebCrawlerFileWriterTest {
         Elements headings = getHeadings();
         WebCrawlerResult result = new WebCrawlerResult(configuration, headings);
         String sourceLanguage = "de";
-        webCrawlerFileWriter.writeBaseReport(result, sourceLanguage);
+        webCrawlerFileWriter.writeCrawlerResultToFileAsBaseReport(result, sourceLanguage);
         webCrawlerFileWriter.flush();
 
         String expected = """
@@ -51,7 +51,7 @@ class WebCrawlerFileWriterTest {
     void writeNestedReportTest() throws IOException {
         Elements headings = getHeadings();
         WebCrawlerResult result = new WebCrawlerResult(configuration, headings);
-        webCrawlerFileWriter.writeNestedReport(result, 2);
+        webCrawlerFileWriter.writeCrawlerResultToFileAsNestedReport(result, 2);
         webCrawlerFileWriter.flush();
 
         String expected = """
@@ -78,7 +78,7 @@ class WebCrawlerFileWriterTest {
 
     @Test
     void writeBrokenLinkReportTest() throws IOException {
-        webCrawlerFileWriter.writeBrokenLinkReport(configuration, 3);
+        webCrawlerFileWriter.writeCrawlerResultBrokenLinkToFileAtDepth(configuration, 3);
         webCrawlerFileWriter.flush();
 
         String expected = """

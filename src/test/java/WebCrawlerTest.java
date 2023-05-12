@@ -3,40 +3,40 @@ import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class WebCrawlerTest {
 
-    @Mock
     private WebsiteService mockedWebsiteService;
-
-    @InjectMocks
     private WebCrawler webCrawler;
 
     private final String[] args = new String[]{"https://www.aau.at", "0", "english"};
     private final WebCrawlerConfiguration configuration = new WebCrawlerConfiguration(args);
 
     private final static String TEST_FILES_PATH = "testfiles";
-
     private final static String OUTPUT_FILE_NAME = "output.md";
 
     @BeforeEach
     void setup() throws IOException, TranslatorAPINetworkException {
-        webCrawler = new WebCrawler(configuration);
-        MockitoAnnotations.openMocks(this);
+        init(configuration);
+    }
+
+    private void init(WebCrawlerConfiguration configuration) throws IOException, TranslatorAPINetworkException {
         Files.deleteIfExists(Path.of(OUTPUT_FILE_NAME));
 
+        webCrawler = new WebCrawler(configuration);
+        mockedWebsiteService = Mockito.mock(WebsiteService.class);
+        webCrawler.setWebsiteService(mockedWebsiteService);
+
         Translator mockedTranslator = Mockito.mock(Translator.class);
-        Mockito.when(mockedTranslator.translate(Mockito.anyString(), Mockito.anyString())).thenAnswer(i -> i.getArguments()[0]);
+        Mockito.when(mockedTranslator.translate(Mockito.anyString(), Mockito.anyString()))
+                .thenAnswer(i -> i.getArguments()[0]);  // When Translator#translate is invoked, just return the first parameter
         webCrawler.setTranslator(mockedTranslator);
     }
 
@@ -79,20 +79,18 @@ class WebCrawlerTest {
     }
 
     @Test
-    void crawlWith1DepthTest() throws IOException {
-        String[] args = new String[]{"https://www.aau.at", "1", "english"};
-        WebCrawlerConfiguration configuration = new WebCrawlerConfiguration(args);
-        webCrawler = new WebCrawler(configuration);
-        mockedWebsiteService = Mockito.mock(WebsiteService.class);
-        webCrawler.setWebsiteService(mockedWebsiteService);
+    void crawlWith1DepthTest() throws IOException, TranslatorAPINetworkException {
+        String[] argsFor1Depth = new String[]{"https://www.aau.at", "1", "english"};
+        WebCrawlerConfiguration configurationFor1Depth = new WebCrawlerConfiguration(argsFor1Depth);
+        init(configurationFor1Depth);
 
         Website rootWebsite = getWebsite("rootWebsiteForCrawlTest.html");
         Website nestedWebsite = getWebsite("nestedWebsiteForCrawlTest.html");
 
         Mockito.when(mockedWebsiteService.getWebsite(Mockito.any(WebCrawlerConfiguration.class)))
-                .thenReturn(rootWebsite)
-                .thenReturn(nestedWebsite)
-                .thenReturn(null);
+                .thenReturn(rootWebsite)    // Return the root website at the first invocation of WebsiteService#getWebsite
+                .thenReturn(nestedWebsite)  // Return the nested website at the second invocation of WebsiteService#getWebsite
+                .thenReturn(null);          // Return the null at the third invocation of WebsiteService#getWebsite
 
         webCrawler.run();
 
