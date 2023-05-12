@@ -8,7 +8,7 @@ import java.util.Map;
 public class Translator {
 
     private final static Map<String, String> languagesWithAbbreviations = createLanguagesWithAbbreviations();
-    private final static String KEY = "8add8089dfmsh39f77e11496092bp149c84jsn9c1e220cd5af";
+    private final static String KEY = "";
     private OkHttpClient client = new OkHttpClient();
 
     private static Map<String, String> createLanguagesWithAbbreviations() {
