@@ -34,18 +34,29 @@ public class WebCrawler {
 
         Website website = websiteService.getWebsite(configuration);
         if (website != null) {
-            if (isRootConfiguration(configuration)) {
-                sourceLanguage = website.getSourceLanguage();
-            }
-            crawledLinks.add(configuration.getUrl());
-            Elements translatedHeadings = translateHeadings(website.getHeadings());
-            Set<String> links = website.getLinks();
-            WebCrawlerResult result = new WebCrawlerResult(configuration, translatedHeadings);
-            writeCrawlerResultToFileAtDepth(result, getCurrentDepth(configuration));
-            crawlLinks(links, configuration.getDepth());
+            crawlWebsiteWithConfiguration(website, configuration);
         } else {
             handleBrokenLink(configuration);
         }
+    }
+
+    /**
+     * This is a recursively called function that crawls the given website with the given configuration.
+     * The configuration holds a depth via which the recursion is controlled, the URL of the website and the target language for the translation.
+     *
+     * @param website
+     * @param configuration
+     */
+    private void crawlWebsiteWithConfiguration(Website website, WebCrawlerConfiguration configuration) {
+        if (isRootConfiguration(configuration)) {
+            sourceLanguage = website.getSourceLanguage();
+        }
+        crawledLinks.add(configuration.getUrl());
+        Elements translatedHeadings = translateHeadings(website.getHeadings());
+        Set<String> links = website.getLinks();
+        WebCrawlerResult result = new WebCrawlerResult(configuration, translatedHeadings);
+        writeCrawlerResultToFileAtDepth(result, getCurrentDepth(configuration));
+        crawlLinks(links, configuration.getDepth());
     }
 
     private boolean isRootConfiguration(WebCrawlerConfiguration configuration) {
@@ -90,10 +101,14 @@ public class WebCrawler {
             configurationArgs[1] = String.valueOf(depth - 1);
             configurationArgs[2] = rootConfiguration.getLanguage();
             if (isUnvisitedValidLink(link, configurationArgs)) {
-                WebCrawlerConfiguration nestedConfiguration = new WebCrawlerConfiguration(configurationArgs);
-                crawlConfiguration(nestedConfiguration);
+                crawlUnvisitedValidLink(configurationArgs);
             }
         }
+    }
+
+    private void crawlUnvisitedValidLink(String[] configurationArgs) {
+        WebCrawlerConfiguration nestedConfiguration = new WebCrawlerConfiguration(configurationArgs);
+        crawlConfiguration(nestedConfiguration);
     }
 
     private int getCurrentDepth(WebCrawlerConfiguration configuration) {
