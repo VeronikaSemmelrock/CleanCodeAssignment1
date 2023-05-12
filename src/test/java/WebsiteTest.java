@@ -50,6 +50,7 @@ class WebsiteTest {
         Set<String> expectedLinks = new HashSet<>();
         expectedLinks.add("https://www.aau.at/");
         expectedLinks.add("https://campus.aau.at/");
+
         assertEquals(expectedLinks, websiteWithLang.getLinks());
     }
 
@@ -57,7 +58,7 @@ class WebsiteTest {
     void getHeadingsTest() {
         List<String> expectedHtmlHeadings = IntStream.range(1, 7).mapToObj(this::getHtmlHeadingForTest).collect(Collectors.toList());
         List<String> actualHtmlHeadings = websiteWithLang.getHeadings().stream().map(Element::toString).collect(Collectors.toList());
-        assertEquals(expectedHtmlHeadings.size(), actualHtmlHeadings.size());
+
         assertIterableEquals(expectedHtmlHeadings, actualHtmlHeadings);
     }
 

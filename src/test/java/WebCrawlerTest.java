@@ -42,7 +42,7 @@ class WebCrawlerTest {
 
     @Test
     void crawlRootIsDeadLinkTest() throws IOException {
-        Mockito.when(mockedWebsiteService.getWebsite(Mockito.any(WebCrawlerConfiguration.class))).thenReturn(null);
+        initForRootIsDeadLinkTest();
 
         webCrawler.run();
 
@@ -56,8 +56,7 @@ class WebCrawlerTest {
 
     @Test
     void crawlWith0DepthTest() throws IOException {
-        Website website = getWebsite("rootWebsiteForCrawlTest.html");
-        Mockito.when(mockedWebsiteService.getWebsite(Mockito.any(WebCrawlerConfiguration.class))).thenReturn(website);
+        initFor0DepthTest();
 
         webCrawler.run();
 
@@ -80,17 +79,7 @@ class WebCrawlerTest {
 
     @Test
     void crawlWith1DepthTest() throws IOException, TranslatorAPINetworkException {
-        String[] argsFor1Depth = new String[]{"https://www.aau.at", "1", "english"};
-        WebCrawlerConfiguration configurationFor1Depth = new WebCrawlerConfiguration(argsFor1Depth);
-        init(configurationFor1Depth);
-
-        Website rootWebsite = getWebsite("rootWebsiteForCrawlTest.html");
-        Website nestedWebsite = getWebsite("nestedWebsiteForCrawlTest.html");
-
-        Mockito.when(mockedWebsiteService.getWebsite(Mockito.any(WebCrawlerConfiguration.class)))
-                .thenReturn(rootWebsite)    // Return the root website at the first invocation of WebsiteService#getWebsite
-                .thenReturn(nestedWebsite)  // Return the nested website at the second invocation of WebsiteService#getWebsite
-                .thenReturn(null);          // Return the null at the third invocation of WebsiteService#getWebsite
+        initFor1DepthTest();
 
         webCrawler.run();
 
@@ -118,10 +107,33 @@ class WebCrawlerTest {
         assertEquals(expectedFileContent, outputFileContent);
     }
 
+    private void initFor1DepthTest() throws IOException, TranslatorAPINetworkException {
+        String[] argsFor1Depth = new String[]{"https://www.aau.at", "1", "english"};
+        WebCrawlerConfiguration configurationFor1Depth = new WebCrawlerConfiguration(argsFor1Depth);
+        init(configurationFor1Depth);
+
+        Website rootWebsite = getWebsite("rootWebsiteForCrawlTest.html");
+        Website nestedWebsite = getWebsite("nestedWebsiteForCrawlTest.html");
+
+        Mockito.when(mockedWebsiteService.getWebsite(Mockito.any(WebCrawlerConfiguration.class)))
+                .thenReturn(rootWebsite)    // Return the root website at the first invocation of WebsiteService#getWebsite
+                .thenReturn(nestedWebsite)  // Return the nested website at the second invocation of WebsiteService#getWebsite
+                .thenReturn(null);          // Return the null at the third invocation of WebsiteService#getWebsite
+    }
+
     private static Website getWebsite(String filename) throws IOException {
         String html = Files.readString(Path.of(TEST_FILES_PATH, filename));
         Document document = Jsoup.parse(html);
         return new Website(document);
+    }
+
+    private void initFor0DepthTest() throws IOException {
+        Website website = getWebsite("rootWebsiteForCrawlTest.html");
+        Mockito.when(mockedWebsiteService.getWebsite(Mockito.any(WebCrawlerConfiguration.class))).thenReturn(website);
+    }
+
+    private void initForRootIsDeadLinkTest() {
+        Mockito.when(mockedWebsiteService.getWebsite(Mockito.any(WebCrawlerConfiguration.class))).thenReturn(null);
     }
 
     @AfterEach

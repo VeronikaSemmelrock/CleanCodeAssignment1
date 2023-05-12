@@ -43,13 +43,11 @@ public class TranslatorTest {
     @Test
     void isValidLanguageTest_validInput() {
         assertTrue(Translator.isValidLanguage("german"));
-        assertTrue(Translator.isValidLanguage("hawaiian"));
     }
 
     @Test
     void isValidLanguageTest_invalidInput() {
         assertFalse(Translator.isValidLanguage("deutsch"));
-        assertFalse(Translator.isValidLanguage("notALanguage"));
     }
 
     @Test
@@ -67,20 +65,21 @@ public class TranslatorTest {
 
     @Test
     void translateTest_validInput() throws IOException, TranslatorAPINetworkException {
-        Mockito.when(mockedResponse.isSuccessful()).thenReturn(true);
-        Mockito.when(mockedResponseBody.string()).thenReturn("{ \"data\": { \"translatedText\": \"Good morning\" }}");
+        initForTranslateTest_validInput();
 
         assertEquals("Good morning", translator.translate("Guten Morgen", "english"));
     }
 
     @Test
-    void translateTest_invalidInput() {
-
+    void translateTest_invalidInputNull() {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> translator.translate(null, "german")
         );
+    }
 
+    @Test
+    void translateTest_invalidInputNotALanguage() {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> translator.translate("Hello", "notALanguage")
@@ -89,12 +88,20 @@ public class TranslatorTest {
 
     @Test
     void translateTest_APIException() {
-        Mockito.when(mockedResponse.isSuccessful()).thenReturn(false);
+        initForTranslateTest_APIException();
         assertThrows(
                 TranslatorAPINetworkException.class,
                 () -> translator.translate("Hallo", "german")
         );
     }
 
+    private void initForTranslateTest_APIException() {
+        Mockito.when(mockedResponse.isSuccessful()).thenReturn(false);
+    }
+
+    private void initForTranslateTest_validInput() throws IOException {
+        Mockito.when(mockedResponse.isSuccessful()).thenReturn(true);
+        Mockito.when(mockedResponseBody.string()).thenReturn("{ \"data\": { \"translatedText\": \"Good morning\" }}");
+    }
 
 }

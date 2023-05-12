@@ -27,10 +27,9 @@ class WebCrawlerFileWriterTest {
 
     @Test
     void writeBaseReportTest() throws IOException {
-        Elements headings = getHeadings();
-        WebCrawlerResult result = new WebCrawlerResult(configuration, headings);
-        String sourceLanguage = "de";
-        webCrawlerFileWriter.writeCrawlerResultToFileAsBaseReport(result, sourceLanguage);
+        WebCrawlerResult result = new WebCrawlerResult(configuration, getHeadings());
+
+        webCrawlerFileWriter.writeCrawlerResultToFileAsBaseReport(result, "de");
         webCrawlerFileWriter.flush();
 
         String expected = """
@@ -49,8 +48,8 @@ class WebCrawlerFileWriterTest {
 
     @Test
     void writeNestedReportTest() throws IOException {
-        Elements headings = getHeadings();
-        WebCrawlerResult result = new WebCrawlerResult(configuration, headings);
+        WebCrawlerResult result = new WebCrawlerResult(configuration, getHeadings());
+
         webCrawlerFileWriter.writeCrawlerResultToFileAsNestedReport(result, 2);
         webCrawlerFileWriter.flush();
 
@@ -63,17 +62,6 @@ class WebCrawlerFileWriterTest {
 
         String actual = Files.readString(Path.of(fileName));
         assertEquals(expected, actual);
-    }
-
-    private Elements getHeadings() {
-        Elements headings = new Elements();
-        Element element1 = new Element("h2");
-        element1.html("<h2>h2Heading</h2>");
-        headings.add(element1);
-        Element element2 = new Element("h1");
-        element2.html("<h1>h1Heading</h1>");
-        headings.add(element2);
-        return headings;
     }
 
     @Test
@@ -93,14 +81,23 @@ class WebCrawlerFileWriterTest {
     @Test
     void emptyFlushTest() throws IOException {
         webCrawlerFileWriter.flush();
-        String expected = "";
         String actual = Files.readString(Path.of(fileName));
-        assertEquals(expected, actual);
+        assertEquals("", actual);
+    }
+
+    private Elements getHeadings() {
+        Elements headings = new Elements();
+        Element element1 = new Element("h2");
+        element1.html("<h2>h2Heading</h2>");
+        headings.add(element1);
+        Element element2 = new Element("h1");
+        element2.html("<h1>h1Heading</h1>");
+        headings.add(element2);
+        return headings;
     }
 
     @AfterAll
     static void teardown() throws IOException {
         Files.deleteIfExists(targetFile.toPath());
     }
-
 }
