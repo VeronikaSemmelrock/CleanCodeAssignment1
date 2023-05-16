@@ -1,10 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class Main {
     private static Scanner scanner = new Scanner(System.in);
@@ -16,9 +13,11 @@ public class Main {
                 "Please enter the arguments in the format {URL};{depth};{targetLanguage}");
 //        String validUserInput = getValidInputViaUserInteraction(scanner.nextLine());
         List<String> urls = new ArrayList<>();
-        urls.add("https://www.neromylos.com");
+        urls.add("https://www.aau.at");
+
         List<Future<String>> futures = new ArrayList<>();
-        String result = "";
+
+        StringBuilder result = new StringBuilder();
         String depth = 1 + "";
         String lang = "english";
 
@@ -29,11 +28,12 @@ public class Main {
         }
 
         for(Future<String> future : futures) {
-            result += future.get();
+            result.append(future.get() + "\n\n");
         }
 
         System.out.println("result from main\n" + result);
         executorService.shutdown();
+        executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
         scanner.close();
     }
 

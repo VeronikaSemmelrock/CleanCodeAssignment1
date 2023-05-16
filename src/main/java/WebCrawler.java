@@ -11,15 +11,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class WebCrawler {
 
     private final WebCrawlerConfiguration rootConfiguration;
     private final WebCrawlerFileWriter webCrawlerFileWriter;
     private final Set<String> crawledLinks;
-
-    static ExecutorService executorService = Executors.newFixedThreadPool(5);
-
 
     private StringBuilder stringBuilder = new StringBuilder();
 
@@ -76,8 +74,8 @@ public class WebCrawler {
         if (configuration.getDepth() != 0) {
             for (String url : links) {
                 WebCrawler webCrawler = new WebCrawler(new WebCrawlerConfiguration(new String[]{url, configuration.getDepth() - 1 + "", configuration.getLanguage()}));
-                Future<String> future = executorService.submit(() -> webCrawler.run());
-                futures.add(future);
+                Future<String> future = Main.executorService.submit(() -> webCrawler.run());
+                    futures.add(future);
             }
         }
 
@@ -85,7 +83,7 @@ public class WebCrawler {
         WebCrawlerResult result = new WebCrawlerResult(configuration, translatedHeadings);
         stringBuilder.append(writeCrawlerResultToFileAtDepth(result, getCurrentDepth(configuration)));
 
-        for(Future<String> future : futures) {
+        for (Future<String> future : futures) {
             stringBuilder.append(future.get());
         }
     }
