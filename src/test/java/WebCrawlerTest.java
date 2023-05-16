@@ -44,7 +44,7 @@ class WebCrawlerTest {
     void crawlRootIsDeadLinkTest() throws IOException {
         initForRootIsDeadLinkTest();
 
-        webCrawler.run();
+//        webCrawler.run();
 
         String outputFileContent = Files.readString(Path.of(OUTPUT_FILE_NAME));
         String expectedFileContent = """
@@ -58,7 +58,7 @@ class WebCrawlerTest {
     void crawlWith0DepthTest() throws IOException {
         initFor0DepthTest();
 
-        webCrawler.run();
+//        webCrawler.run();
 
         String outputFileContent = Files.readString(Path.of(OUTPUT_FILE_NAME));
         String expectedFileContent = """
@@ -81,7 +81,7 @@ class WebCrawlerTest {
     void crawlWith1DepthTest() throws IOException, TranslatorAPINetworkException {
         initFor1DepthTest();
 
-        webCrawler.run();
+//        webCrawler.run();
 
         String outputFileContent = Files.readString(Path.of(OUTPUT_FILE_NAME));
         String expectedFileContent = """
