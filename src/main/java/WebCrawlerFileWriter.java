@@ -14,29 +14,27 @@ public class WebCrawlerFileWriter {
         this.outputFile = outputFile;
     }
 
-    public String writeCrawlerResultToFileAsBaseReport(WebCrawlerResult webCrawlerResult, String sourceLanguage) {
-        WebCrawlerConfiguration webCrawlerConfiguration = webCrawlerResult.getWebCrawlerConfiguration();
+    public String writeCrawlerResultToFileAsBaseReport(WebCrawlerResult webCrawlerResult, int maxDepth, String targetLanguage, String sourceLanguage) {
         StringBuilder baseReport = new StringBuilder();
-        baseReport.append("input: <a>" + webCrawlerConfiguration.getUrl() + "</a>\n");
-        baseReport.append("<br>depth: " + webCrawlerConfiguration.getDepth() + "\n");
+        baseReport.append("input: <a>" + webCrawlerResult.getUrl() + "</a>\n");
+        baseReport.append("<br>depth: " + maxDepth + "\n");
         baseReport.append("<br>source language: " + sourceLanguage + "\n");
-        baseReport.append("<br>target language: " + webCrawlerConfiguration.getLanguage() + "\n");
+        baseReport.append("<br>target language: " + targetLanguage + "\n");
         baseReport.append("<br>summary:" + "\n");
 
         baseReport.append(appendCrawlerResultHeadingsToFileAtDepth(webCrawlerResult, 0));
         return baseReport.toString();
     }
 
-    public String writeCrawlerResultToFileAsNestedReport(WebCrawlerResult nestedWebCrawlerResult, int depth) {
-        WebCrawlerConfiguration webCrawlerConfiguration = nestedWebCrawlerResult.getWebCrawlerConfiguration();
-        String crawledUrl = webCrawlerConfiguration.getUrl();
+    public String writeCrawlerResultToFileAsNestedReport(WebCrawlerResult nestedWebCrawlerResult) {
+        String crawledUrl = nestedWebCrawlerResult.getUrl();
         StringBuilder markdownCrawledUrl = new StringBuilder();
         markdownCrawledUrl.append("\n<br>");
-        markdownCrawledUrl.append(getArrowRepresentationOfDepth(depth));
+        markdownCrawledUrl.append(getArrowRepresentationOfDepth(nestedWebCrawlerResult.getDepth()));
         markdownCrawledUrl.append(" link to <a>");
         markdownCrawledUrl.append(crawledUrl);
         markdownCrawledUrl.append("</a>\n");
-        markdownCrawledUrl.append(appendCrawlerResultHeadingsToFileAtDepth(nestedWebCrawlerResult, depth));
+        markdownCrawledUrl.append(appendCrawlerResultHeadingsToFileAtDepth(nestedWebCrawlerResult, nestedWebCrawlerResult.getDepth()));
         return markdownCrawledUrl.toString();
     }
 
@@ -49,11 +47,11 @@ public class WebCrawlerFileWriter {
         return stringBuilder.toString();
     }
 
-    public String writeCrawlerResultBrokenLinkToFileAtDepth(WebCrawlerConfiguration configuration, int depth) {
+    public String writeCrawlerResultBrokenLinkToFileAtDepth(String url, int depth) {
         StringBuilder brokenLink = new StringBuilder();
         brokenLink.append("\n");
         brokenLink.append(getArrowRepresentationOfDepth(depth));
-        brokenLink.append(" broken link <a>" + configuration.getUrl() + "</a>\n");
+        brokenLink.append(" broken link <a>" + url + "</a>\n");
         return brokenLink.toString();
     }
 

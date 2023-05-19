@@ -1,3 +1,3 @@
 public interface WebsiteService {
-    Website getWebsite(WebCrawlerConfiguration configuration);
+    Website getWebsite(String url);
 }

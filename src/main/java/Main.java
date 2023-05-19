@@ -1,12 +1,11 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
 
 public class Main {
-    private static Scanner scanner = new Scanner(System.in);
 
-    static ExecutorService executorService = Executors.newFixedThreadPool(5);
+    private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         System.out.println("Welcome to WebCrawler. Please enter a URL that should be crawled, the depth of websites to crawl, and the target language! " +
@@ -14,26 +13,13 @@ public class Main {
 //        String validUserInput = getValidInputViaUserInteraction(scanner.nextLine());
         List<String> urls = new ArrayList<>();
         urls.add("https://www.aau.at");
+//        urls.add("https://www.google.at");
+//        urls.add("https://www.orf.at");
+//        urls.add("https://www.cinecity.at");
+        urls.add("https://www.neromylos.com");
 
-        List<Future<String>> futures = new ArrayList<>();
-
-        StringBuilder result = new StringBuilder();
-        String depth = 1 + "";
-        String lang = "english";
-
-        for(String url : urls) {
-            WebCrawler webCrawler = new WebCrawler(new WebCrawlerConfiguration(new String[]{url, depth, lang}));
-            Future<String> future = executorService.submit(() -> webCrawler.run());
-            futures.add(future);
-        }
-
-        for(Future<String> future : futures) {
-            result.append(future.get() + "\n\n");
-        }
-
-        System.out.println("result from main\n" + result);
-        executorService.shutdown();
-        executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+        WebCrawler webCrawler = new WebCrawler(1, "english", urls);
+        webCrawler.run();
         scanner.close();
     }
 
@@ -46,6 +32,19 @@ public class Main {
     }
 
     private static boolean verifyUserInput(String userInput) {
-        return WebCrawlerConfiguration.isValidConfiguration(userInput.split(";"));
+
+        String[] userInputArgs = userInput.split(";");
+        List<String> urls = new ArrayList<>();
+        for (int i = 0; i < userInputArgs.length; i++) {
+            if (i > 1) {
+                urls.add(userInputArgs[i]);
+            }
+        }
+        return isValidConfiguration(Integer.parseInt(userInputArgs[0]), userInputArgs[1], urls);
     }
+
+    public static boolean isValidConfiguration(int depth, String language, List<String> urls) {
+        return WebCrawler.areValidURLs(urls) && WebCrawler.isValidDepth(depth) && WebCrawler.isValidLanguage(language);
+    }
+
 }

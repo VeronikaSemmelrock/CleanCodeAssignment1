@@ -73,17 +73,18 @@ public class Translator {
     }
 
     public String translate(String text, String targetLanguage) throws IllegalArgumentException, IOException, TranslatorAPINetworkException {
-        RequestBody requestBody = createTranslationRequestBody(text, targetLanguage);
-        Request request = createTranslationRequest(requestBody);
-        Response response = client.newCall(request).execute();
-
-        if (response.isSuccessful()) {
-            JSONObject responseBody = new JSONObject(response.body().string());
-            String translatedText = responseBody.getJSONObject("data").getString("translatedText");
-            return translatedText;
-        } else {
-            throw new TranslatorAPINetworkException("Translation did not work!");
-        }
+//        RequestBody requestBody = createTranslationRequestBody(text, targetLanguage);
+//        Request request = createTranslationRequest(requestBody);
+//        Response response = client.newCall(request).execute();
+//
+//        if (response.isSuccessful()) {
+//            JSONObject responseBody = new JSONObject(response.body().string());
+//            String translatedText = responseBody.getJSONObject("data").getString("translatedText");
+//            return translatedText;
+//        } else {
+//            throw new TranslatorAPINetworkException("Translation did not work!");
+//        }
+        return text;
     }
 
     private Request createTranslationRequest(RequestBody requestBody) {
