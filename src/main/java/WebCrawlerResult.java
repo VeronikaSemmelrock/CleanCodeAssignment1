@@ -1,11 +1,11 @@
-import org.jsoup.select.Elements;
+import java.util.List;
 
 public class WebCrawlerResult {
     private final int depth;
     private final String url;
-    private final Elements headings;
+    private final List<Heading> headings;
 
-    public WebCrawlerResult(int depth, String url, Elements headings) {
+    public WebCrawlerResult(int depth, String url, List<Heading> headings) {
         this.depth = depth;
         this.url = url;
         this.headings = headings;
@@ -15,7 +15,7 @@ public class WebCrawlerResult {
         return url;
     }
 
-    public Elements getHeadings() {
+    public List<Heading> getHeadings() {
         return headings;
     }
 

@@ -18,20 +18,25 @@ public class Main {
 //        urls.add("https://www.cinecity.at");
         urls.add("https://www.neromylos.com");
 
-        WebCrawler webCrawler = new WebCrawler(1, "english", urls);
+        WebCrawler webCrawler = new WebCrawler(2, "english", urls);
+        WebsiteService websiteService = new WebsiteService(new JsoupHttpConnector());
+        webCrawler.setWebsiteService(websiteService);
+        Translator translator = new TextTranslator2Translator();
+        webCrawler.setTranslator(translator);
+
         webCrawler.run();
         scanner.close();
     }
 
-    private static String getValidInputViaUserInteraction(String userInput) {
-        while (!verifyUserInput(userInput)) {
+    private static String getValidInputViaUserInteraction(String userInput, Translator translator) {
+        while (!verifyUserInput(userInput, translator)) {
             System.out.println("Please enter correct arguments in the format {URL};{depth};{targetLanguage}!");
             userInput = scanner.nextLine();
         }
         return userInput;
     }
 
-    private static boolean verifyUserInput(String userInput) {
+    private static boolean verifyUserInput(String userInput, Translator translator) {
 
         String[] userInputArgs = userInput.split(";");
         List<String> urls = new ArrayList<>();
@@ -40,11 +45,11 @@ public class Main {
                 urls.add(userInputArgs[i]);
             }
         }
-        return isValidConfiguration(Integer.parseInt(userInputArgs[0]), userInputArgs[1], urls);
+        return isValidConfiguration(Integer.parseInt(userInputArgs[0]), userInputArgs[1], urls, translator);
     }
 
-    public static boolean isValidConfiguration(int depth, String language, List<String> urls) {
-        return WebCrawler.areValidURLs(urls) && WebCrawler.isValidDepth(depth) && WebCrawler.isValidLanguage(language);
+    public static boolean isValidConfiguration(int depth, String language, List<String> urls, Translator translator) {
+        return WebCrawler.areValidURLs(urls) && WebCrawler.isValidDepth(depth) && translator.isValidLanguage(language);
     }
 
 }

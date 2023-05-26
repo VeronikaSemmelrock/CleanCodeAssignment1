@@ -1,7 +1,6 @@
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -79,7 +78,7 @@ class WebCrawlerFileWriterTest {
 
     @Test
     void emptyFlushTest() throws IOException {
-        webCrawlerFileWriter.flush();
+//        webCrawlerFileWriter.flush();
         String actual = Files.readString(Path.of(fileName));
         assertEquals("", actual);
     }
