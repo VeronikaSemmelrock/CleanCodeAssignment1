@@ -1,16 +1,12 @@
 public class WebsiteService {
 
-    private HttpConnector httpConnector;
+    private final HttpConnector httpConnector;
 
     public WebsiteService(HttpConnector httpConnector) {
         this.httpConnector = httpConnector;
     }
 
-    public CrawledDocument getWebsite(String url) {
-        try {
-           return httpConnector.get(url);
-        } catch (Exception e) {
-            return null;
-        }
+    public CrawledDocument getWebsite(String url) throws HttpConnectorException {
+        return httpConnector.getDocument(url);
     }
 }

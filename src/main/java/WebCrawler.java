@@ -1,8 +1,6 @@
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,23 +8,16 @@ public class WebCrawler {
 
     private final int maxDepth;
     private final String targetLanguage;
-    private final List<String> urls;
 
-    private final WebCrawlerResultBuilder webCrawlerResultBuilder;
-
-    private Translator translator;
-
-    private String sourceLanguage;
+    private TranslatorService translatorService;
     private WebsiteService websiteService;
 
-    public WebCrawler(int maxDepth, String targetLanguage, List<String> urls) {
+    public WebCrawler(int maxDepth, String targetLanguage) {
         this.maxDepth = maxDepth;
         this.targetLanguage = targetLanguage;
-        this.urls = Collections.unmodifiableList(urls);
-        this.webCrawlerResultBuilder = new WebCrawlerResultBuilder();
     }
 
-    public void run() {
+    public void run(List<String> urls) {
 
         WebCrawlerScheduler webCrawlerScheduler = new WebCrawlerScheduler();
 
@@ -34,38 +25,31 @@ public class WebCrawler {
             webCrawlerScheduler.submit(() -> crawlConfiguration(url, 0), url);
         }
 
-        String result = webCrawlerScheduler.getScheduledResult();
+        String resultOfChildren = webCrawlerScheduler.getResult();
 
         webCrawlerScheduler.shutdown();
-        WebCrawlerFileWriter.writeToFile(result);
+        WebCrawlerFileWriter.writeToFile(resultOfChildren);
     }
 
-    private String crawlConfiguration(String url, int depth) throws ExecutionException, InterruptedException, TimeoutException {
+    private String crawlConfiguration(String url, int depth) {
         System.out.println("Crawling " + url + " with depth " + depth);
 
-        CrawledDocument website = websiteService.getWebsite(url);
-        if (website != null) {
-            return crawlWebsiteWithConfiguration(website, url, depth);
-        } else {
+        try {
+            CrawledDocument document = websiteService.getWebsite(url);
+            return crawlDocumentWithConfiguration(document, url, depth);
+        } catch (HttpConnectorException e) {
             return handleBrokenLink(url, depth);
         }
     }
 
-    /**
-     * This is a recursively called function that crawls the given website with the given configuration.
-     * The configuration holds a depth via which the recursion is controlled, the URL of the website and the target language for the translation.
-     * <p>
-     * //     * @param website
-     * //     * @param configuration
-     */
-    private String crawlWebsiteWithConfiguration(CrawledDocument website, String url, int depth) throws ExecutionException, InterruptedException, TimeoutException {
+    private String crawlDocumentWithConfiguration(CrawledDocument document, String url, int depth) {
         if (depth == 0) {
-            sourceLanguage = website.getSourceLanguage();
+            WebCrawlerResultBuilder.sourceLanguage = document.getSourceLanguage();
         }
 
         WebCrawlerScheduler webCrawlerScheduler = new WebCrawlerScheduler();
 
-        Set<String> links = website.getLinks();
+        Set<String> links = document.getLinks();
         if (depth < maxDepth) {
             for (String link : links) {
                 if (isUnvisitedValidLink(link)) {
@@ -74,43 +58,47 @@ public class WebCrawler {
             }
         }
 
-        List<Heading> translatedHeadings = translateHeadings(website.getHeadings());
+        List<Heading> translatedHeadings = translateHeadings(document.getHeadings());
         WebCrawlerResult webCrawlerResult = new WebCrawlerResult(depth, url, translatedHeadings);
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(writeCrawlerResultToFileAtDepth(webCrawlerResult));
+        StringBuilder resultingReport = new StringBuilder();
+        resultingReport.append(getCrawlerResultAsReport(webCrawlerResult));
 
-        String result = webCrawlerScheduler.getScheduledResult();
-        stringBuilder.append(result);
+        String resultOfChildren = webCrawlerScheduler.getResult();
+        resultingReport.append(resultOfChildren);
 
-        System.out.println(Thread.currentThread().getName() + " generated result\n" + stringBuilder);
-        return stringBuilder.toString();
+        return resultingReport.toString();
     }
 
     private String handleBrokenLink(String url, int depth) {
-        return webCrawlerResultBuilder.writeCrawlerResultBrokenLinkToFileAtDepth(url, depth);
+        return WebCrawlerResultBuilder.getCrawlerResultAsBrokenLinkAtDepth(url, depth);
     }
 
     private List<Heading> translateHeadings(List<Heading> headings) {
         List<Heading> translatedHeadings = new ArrayList<>();
         try {
             for (Heading heading : headings) {
-                Heading translatedHeading = new Heading(translator.translate(heading.getText(), targetLanguage), heading.getIndent());
+                Heading translatedHeading = new Heading(translatorService.translate(heading.getText(), targetLanguage), heading.getIndent());
                 translatedHeadings.add(translatedHeading);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Something went wrong trying to translate the headings. The headings will be written to the file without translation!");
-            return headings;
+            return getHeadingsWithErrorMessage(headings);
         }
         return translatedHeadings;
     }
 
-    private String writeCrawlerResultToFileAtDepth(WebCrawlerResult result) {
+    private List<Heading> getHeadingsWithErrorMessage(List<Heading> headings) {
+        for (Heading heading : headings) {
+            heading.setText(heading.getText() + " (Not translated because of translation error)");
+        }
+        return headings;
+    }
+
+    private String getCrawlerResultAsReport(WebCrawlerResult result) {
         if (result.getDepth() == 0) {
-            return webCrawlerResultBuilder.writeCrawlerResultToFileAsBaseReport(result, maxDepth, targetLanguage, sourceLanguage);
+            return WebCrawlerResultBuilder.getCrawlerResultAsBaseReport(result, maxDepth, targetLanguage);
         } else {
-            return webCrawlerResultBuilder.writeCrawlerResultToFileAsNestedReport(result);
+            return WebCrawlerResultBuilder.getCrawlerResultAsNestedReport(result);
         }
     }
 
@@ -122,8 +110,8 @@ public class WebCrawler {
         this.websiteService = websiteService;
     }
 
-    public void setTranslator(Translator translator) {
-        this.translator = translator;
+    public void setTranslator(TranslatorService translatorService) {
+        this.translatorService = translatorService;
     }
 
     public static boolean isValidDepth(int inputDepth) {

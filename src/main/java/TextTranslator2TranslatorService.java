@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TextTranslator2Translator implements Translator {
+public class TextTranslator2TranslatorService implements TranslatorService {
 
     private final static Map<String, String> languagesWithAbbreviations = createLanguagesWithAbbreviations();
     private final static String KEY = "8add8089dfmsh39f77e11496092bp149c84jsn9c1e220cd5af";
@@ -74,19 +74,26 @@ public class TextTranslator2Translator implements Translator {
     }
 
     @Override
-    public String translate(String text, String targetLanguage) throws IllegalArgumentException, IOException, TranslatorAPINetworkException {
-//        RequestBody requestBody = createTranslationRequestBody(text, targetLanguage);
-//        Request request = createTranslationRequest(requestBody);
-//        Response response = client.newCall(request).execute();
+    public String translate(String text, String targetLanguage) throws TranslatorServiceException {
+//        try {
+//            RequestBody requestBody = createTranslationRequestBody(text, targetLanguage);
+//            Request request = createTranslationRequest(requestBody);
+//            Response response = client.newCall(request).execute();
 //
-//        if (response.isSuccessful()) {
-//            JSONObject responseBody = new JSONObject(response.body().string());
-//            String translatedText = responseBody.getJSONObject("data").getString("translatedText");
-//            return translatedText;
-//        } else {
-//            throw new TranslatorAPINetworkException("Translation did not work!");
+//            if (response.isSuccessful()) {
+//                return getTranslatedTextFromResponse(response);
+//            } else {
+//                throw new TranslatorServiceException("Translation did not work!");
+//            }
+//        } catch (Exception e) {
+//            throw new TranslatorServiceException("Translation did not work!");
 //        }
         return text;
+    }
+
+    private String getTranslatedTextFromResponse(Response response) throws IOException {
+        JSONObject responseBody = new JSONObject(response.body().string());
+        return responseBody.getJSONObject("data").getString("translatedText");
     }
 
     private Request createTranslationRequest(RequestBody requestBody) {

@@ -8,9 +8,9 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TextTranslator2TranslatorTest {
+public class TextTranslator2TranslatorServiceTest {
     private static OkHttpClient mockedClient;
-    private static TextTranslator2Translator textTranslator2Translator;
+    private static TextTranslator2TranslatorService textTranslator2Translator;
 
     private static Response mockedResponse;
     private static Call mockedCall;
@@ -19,7 +19,7 @@ public class TextTranslator2TranslatorTest {
     @BeforeAll
     static void setUp() throws IOException {
         mockedClient = Mockito.mock(OkHttpClient.class);
-        textTranslator2Translator = new TextTranslator2Translator();
+        textTranslator2Translator = new TextTranslator2TranslatorService();
         textTranslator2Translator.setClient(mockedClient);
         mockedResponse = Mockito.mock(Response.class);
         mockedCall = Mockito.mock(Call.class);
@@ -52,19 +52,19 @@ public class TextTranslator2TranslatorTest {
 
     @Test
     void getAbbreviationOfLanguageTest_validInput() {
-        assertEquals("de", TextTranslator2Translator.getAbbreviationOfLanguage("german"));
+        assertEquals("de", TextTranslator2TranslatorService.getAbbreviationOfLanguage("german"));
     }
 
     @Test
     void getAbbreviationOfLanguageTest_invalidInput() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> TextTranslator2Translator.getAbbreviationOfLanguage("notALanguage")
+                () -> TextTranslator2TranslatorService.getAbbreviationOfLanguage("notALanguage")
         );
     }
 
     @Test
-    void translateTest_validInput() throws IOException, TranslatorAPINetworkException {
+    void translateTest_validInput() throws IOException, TranslatorServiceException {
         initForTranslateTest_validInput();
 
         assertEquals("Good morning", textTranslator2Translator.translate("Guten Morgen", "english"));
@@ -90,7 +90,7 @@ public class TextTranslator2TranslatorTest {
     void translateTest_APIException() {
         initForTranslateTest_APIException();
         assertThrows(
-                TranslatorAPINetworkException.class,
+                TranslatorServiceException.class,
                 () -> textTranslator2Translator.translate("Hallo", "german")
         );
     }

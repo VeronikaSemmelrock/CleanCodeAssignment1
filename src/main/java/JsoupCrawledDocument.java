@@ -15,13 +15,13 @@ public class JsoupCrawledDocument implements CrawledDocument {
 
     @Override
     public List<Heading> getHeadings() {
-        Elements jsoupHeadings = filterBlankHeadings(document.select("h1,h2,h3,h4,h5,h6"));
-        return jsoupHeadings.stream().map(element -> new Heading(element.ownText(), Integer.parseInt(element.tagName().substring(1))))
+        Elements filteredHeadings = filterBlankHeadings(document.select("h1,h2,h3,h4,h5,h6"));
+        return filteredHeadings.stream().map(element -> new Heading(element.ownText(), Integer.parseInt(element.tagName().substring(1))))
                 .collect(Collectors.toList());
     }
 
-    private org.jsoup.select.Elements filterBlankHeadings(org.jsoup.select.Elements headings) {
-        return headings.stream().filter(heading -> !heading.ownText().isBlank()).collect(Collectors.toCollection(org.jsoup.select.Elements::new));
+    private Elements filterBlankHeadings(Elements headings) {
+        return headings.stream().filter(heading -> !heading.ownText().isBlank()).collect(Collectors.toCollection(Elements::new));
     }
 
     @Override

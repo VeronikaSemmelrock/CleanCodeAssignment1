@@ -1,11 +1,10 @@
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
 import java.util.List;
 
 public class WebCrawlerResultBuilder {
 
-    public String writeCrawlerResultToFileAsBaseReport(WebCrawlerResult webCrawlerResult, int maxDepth, String targetLanguage, String sourceLanguage) {
+    public static String sourceLanguage;
+
+    public static String getCrawlerResultAsBaseReport(WebCrawlerResult webCrawlerResult, int maxDepth, String targetLanguage) {
         StringBuilder baseReport = new StringBuilder();
         baseReport.append("input: <a>" + webCrawlerResult.getUrl() + "</a>\n");
         baseReport.append("<br>depth: " + maxDepth + "\n");
@@ -13,11 +12,11 @@ public class WebCrawlerResultBuilder {
         baseReport.append("<br>target language: " + targetLanguage + "\n");
         baseReport.append("<br>summary:" + "\n");
 
-        baseReport.append(appendCrawlerResultHeadingsToFileAtDepth(webCrawlerResult, 0));
+        baseReport.append(getCrawlerResultHeadingsAtDepth(webCrawlerResult, 0));
         return baseReport.toString();
     }
 
-    public String writeCrawlerResultToFileAsNestedReport(WebCrawlerResult nestedWebCrawlerResult) {
+    public static String getCrawlerResultAsNestedReport(WebCrawlerResult nestedWebCrawlerResult) {
         String crawledUrl = nestedWebCrawlerResult.getUrl();
         StringBuilder markdownCrawledUrl = new StringBuilder();
         markdownCrawledUrl.append("\n<br>");
@@ -25,20 +24,20 @@ public class WebCrawlerResultBuilder {
         markdownCrawledUrl.append(" link to <a>");
         markdownCrawledUrl.append(crawledUrl);
         markdownCrawledUrl.append("</a>\n");
-        markdownCrawledUrl.append(appendCrawlerResultHeadingsToFileAtDepth(nestedWebCrawlerResult, nestedWebCrawlerResult.getDepth()));
+        markdownCrawledUrl.append(getCrawlerResultHeadingsAtDepth(nestedWebCrawlerResult, nestedWebCrawlerResult.getDepth()));
         return markdownCrawledUrl.toString();
     }
 
-    private String appendCrawlerResultHeadingsToFileAtDepth(WebCrawlerResult webCrawlerResult, int depth) {
+    private static String getCrawlerResultHeadingsAtDepth(WebCrawlerResult webCrawlerResult, int depth) {
         List<Heading> headings = webCrawlerResult.getHeadings();
         StringBuilder stringBuilder = new StringBuilder();
         for (Heading heading : headings) {
-            stringBuilder.append(headingToMarkDownHeadingWithDepth(heading, depth));
+            stringBuilder.append(getHeadingAsMarkDownHeadingWithDepth(heading, depth));
         }
         return stringBuilder.toString();
     }
 
-    public String writeCrawlerResultBrokenLinkToFileAtDepth(String url, int depth) {
+    public static String getCrawlerResultAsBrokenLinkAtDepth(String url, int depth) {
         StringBuilder brokenLink = new StringBuilder();
         brokenLink.append("\n");
         brokenLink.append(getArrowRepresentationOfDepth(depth));
@@ -46,7 +45,7 @@ public class WebCrawlerResultBuilder {
         return brokenLink.toString();
     }
 
-    private String headingToMarkDownHeadingWithDepth(Heading heading, int depth) {
+    private static String getHeadingAsMarkDownHeadingWithDepth(Heading heading, int depth) {
         StringBuilder markdownHeading = new StringBuilder();
         int headingLevel = heading.getIndent();
         for (int i = 0; i < headingLevel; i++) {
@@ -57,7 +56,7 @@ public class WebCrawlerResultBuilder {
         return markdownHeading.toString();
     }
 
-    private String getArrowRepresentationOfDepth(int depth) {
+    private static String getArrowRepresentationOfDepth(int depth) {
         StringBuilder arrow = new StringBuilder();
         for (int i = 0; i < depth; i++) {
             arrow.append("--");

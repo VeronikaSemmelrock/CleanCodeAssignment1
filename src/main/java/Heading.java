@@ -1,5 +1,6 @@
 public class Heading {
-    private final String text;
+
+    private String text;
     private final int indent;
 
     public Heading(String text, int indent) {
@@ -13,5 +14,9 @@ public class Heading {
 
     public int getIndent() {
         return indent;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }
