@@ -1,3 +1,5 @@
+package websiteService.crawledDocument;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
@@ -16,7 +18,8 @@ public class JsoupCrawledDocument implements CrawledDocument {
     @Override
     public List<Heading> getHeadings() {
         Elements filteredHeadings = filterBlankHeadings(document.select("h1,h2,h3,h4,h5,h6"));
-        return filteredHeadings.stream().map(element -> new Heading(element.ownText(), Integer.parseInt(element.tagName().substring(1))))
+        return filteredHeadings.stream()
+                .map(element -> new Heading(element.ownText(), Integer.parseInt(element.tagName().substring(1))))
                 .collect(Collectors.toList());
     }
 
@@ -27,14 +30,13 @@ public class JsoupCrawledDocument implements CrawledDocument {
     @Override
     public Set<String> getLinks() {
         Elements linkElements = document.select("a");
-        Set<String> links = linkElements.stream().map(element -> element.attr("href")).collect(Collectors.toSet());
-        return links;
+        return linkElements.stream().map(element -> element.attr("href")).collect(Collectors.toSet());
     }
 
     @Override
     public String getSourceLanguage() {
         String sourceLanguage = document.select("html").attr("lang");
-        if (sourceLanguage == null || sourceLanguage.equals("")) {
+        if (sourceLanguage.equals("")) {
             sourceLanguage = "undetectable";
         }
         return sourceLanguage;

@@ -1,3 +1,10 @@
+import translatorService.TextTranslator2TranslatorService;
+import translatorService.TranslatorService;
+import webcrawler.WebCrawler;
+import webcrawler.WebCrawlerScheduler;
+import websiteService.httpConnector.JsoupHttpConnector;
+import websiteService.WebsiteService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -5,7 +12,7 @@ import java.util.Scanner;
 public class Main {
 
     private static final int argCountBeforeUrlArgs = 1;
-    private static Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         try {
@@ -14,14 +21,15 @@ public class Main {
 
             TranslatorService translatorService = new TextTranslator2TranslatorService();
             String validUserInput = getValidInputViaUserInteraction(scanner.nextLine(), translatorService);
+            String[] validUserInputArgs = validUserInput.split(";");
 
             WebCrawlerScheduler.initializeThreadPoolWithThreadCount(300);
-            WebCrawler webCrawler = new WebCrawler(Integer.parseInt(validUserInput.split(";")[0]), "english");
+            WebCrawler webCrawler = new WebCrawler(Integer.parseInt(validUserInputArgs[0]), validUserInputArgs[1]);
             WebsiteService websiteService = new WebsiteService(new JsoupHttpConnector());
             webCrawler.setWebsiteService(websiteService);
-            webCrawler.setTranslator(translatorService);
+            webCrawler.setTranslatorService(translatorService);
 
-            webCrawler.run(extractUrlsFromUserInputArgs(validUserInput.split(";")));
+            webCrawler.run(extractUrlsFromUserInputArgs(validUserInputArgs));
         } finally {
             scanner.close();
         }
@@ -29,16 +37,20 @@ public class Main {
 
     private static String getValidInputViaUserInteraction(String userInput, TranslatorService translatorService) {
         while (!verifyUserInput(userInput, translatorService)) {
-            System.out.println("Please enter correct arguments in the format {URL};{depth};{targetLanguage}!");
+            System.out.println("Please enter correct arguments in the format {depth};{targetLanguage};{URL};{URL};{URL};...{URL}!");
             userInput = scanner.nextLine();
         }
         return userInput;
     }
 
     private static boolean verifyUserInput(String userInput, TranslatorService translatorService) {
-        String[] userInputArgs = userInput.split(";");
-        List<String> urls = extractUrlsFromUserInputArgs(userInputArgs);
-        return isValidConfiguration(Integer.parseInt(userInputArgs[0]), userInputArgs[1], urls, translatorService);
+        try {
+            String[] userInputArgs = userInput.split(";");
+            List<String> urls = extractUrlsFromUserInputArgs(userInputArgs);
+            return isValidConfiguration(Integer.parseInt(userInputArgs[0]), userInputArgs[1], urls, translatorService);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private static List<String> extractUrlsFromUserInputArgs(String[] userInputArgs) {

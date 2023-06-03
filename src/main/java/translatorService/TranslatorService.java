@@ -1,3 +1,5 @@
+package translatorService;
+
 import java.io.IOException;
 
 public interface TranslatorService {

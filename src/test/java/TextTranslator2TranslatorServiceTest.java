@@ -3,6 +3,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import translatorService.TextTranslator2TranslatorService;
+import translatorService.TranslatorServiceException;
 
 import java.io.IOException;
 
@@ -40,15 +42,15 @@ public class TextTranslator2TranslatorServiceTest {
     }
 
 
-//    @Test
-//    void isValidLanguageTest_validInput() {
-//        assertTrue(TextTranslator2Translator.isValidLanguage("german"));
-//    }
-//
-//    @Test
-//    void isValidLanguageTest_invalidInput() {
-//        assertFalse(TextTranslator2Translator.isValidLanguage("deutsch"));
-//    }
+    @Test
+    void isValidLanguageTest_validInput() {
+        assertTrue(textTranslator2Translator.isValidLanguage("german"));
+    }
+
+    @Test
+    void isValidLanguageTest_invalidInput() {
+        assertFalse(textTranslator2Translator.isValidLanguage("deutsch"));
+    }
 
     @Test
     void getAbbreviationOfLanguageTest_validInput() {

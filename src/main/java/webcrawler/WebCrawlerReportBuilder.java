@@ -1,6 +1,10 @@
+package webcrawler;
+
+import websiteService.crawledDocument.Heading;
+
 import java.util.List;
 
-public class WebCrawlerResultBuilder {
+public class WebCrawlerReportBuilder {
 
     public static String sourceLanguage;
 

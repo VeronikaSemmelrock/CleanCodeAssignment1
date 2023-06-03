@@ -1,3 +1,9 @@
+package websiteService;
+
+import websiteService.crawledDocument.CrawledDocument;
+import websiteService.httpConnector.HttpConnector;
+import websiteService.httpConnector.HttpConnectorException;
+
 public class WebsiteService {
 
     private final HttpConnector httpConnector;

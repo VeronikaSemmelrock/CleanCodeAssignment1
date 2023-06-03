@@ -1,3 +1,5 @@
+package translatorService;
+
 import okhttp3.*;
 import org.json.JSONObject;
 
@@ -83,10 +85,10 @@ public class TextTranslator2TranslatorService implements TranslatorService {
 //            if (response.isSuccessful()) {
 //                return getTranslatedTextFromResponse(response);
 //            } else {
-//                throw new TranslatorServiceException("Translation did not work!");
+//                throw new translatorService.TranslatorServiceException("Translation did not work!");
 //            }
 //        } catch (Exception e) {
-//            throw new TranslatorServiceException("Translation did not work!");
+//            throw new translatorService.TranslatorServiceException("Translation did not work!");
 //        }
         return text;
     }

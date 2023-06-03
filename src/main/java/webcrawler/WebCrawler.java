@@ -1,3 +1,11 @@
+package webcrawler;
+
+import translatorService.TranslatorService;
+import websiteService.crawledDocument.CrawledDocument;
+import websiteService.crawledDocument.Heading;
+import websiteService.httpConnector.HttpConnectorException;
+import websiteService.WebsiteService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +40,7 @@ public class WebCrawler {
     }
 
     private String crawlConfiguration(String url, int depth) {
-        System.out.println("Crawling " + url + " with depth " + depth);
+        System.out.println(Thread.currentThread().getName() + " is crawling " + url + " with depth " + depth);
 
         try {
             CrawledDocument document = websiteService.getWebsite(url);
@@ -44,7 +52,7 @@ public class WebCrawler {
 
     private String crawlDocumentWithConfiguration(CrawledDocument document, String url, int depth) {
         if (depth == 0) {
-            WebCrawlerResultBuilder.sourceLanguage = document.getSourceLanguage();
+            WebCrawlerReportBuilder.sourceLanguage = document.getSourceLanguage();
         }
 
         WebCrawlerScheduler webCrawlerScheduler = new WebCrawlerScheduler();
@@ -52,7 +60,7 @@ public class WebCrawler {
         Set<String> links = document.getLinks();
         if (depth < maxDepth) {
             for (String link : links) {
-                if (isUnvisitedValidLink(link)) {
+                if (isValidURL(link)) {
                     webCrawlerScheduler.submit(() -> crawlConfiguration(link, depth + 1), link);
                 }
             }
@@ -71,7 +79,7 @@ public class WebCrawler {
     }
 
     private String handleBrokenLink(String url, int depth) {
-        return WebCrawlerResultBuilder.getCrawlerResultAsBrokenLinkAtDepth(url, depth);
+        return WebCrawlerReportBuilder.getCrawlerResultAsBrokenLinkAtDepth(url, depth);
     }
 
     private List<Heading> translateHeadings(List<Heading> headings) {
@@ -96,21 +104,17 @@ public class WebCrawler {
 
     private String getCrawlerResultAsReport(WebCrawlerResult result) {
         if (result.getDepth() == 0) {
-            return WebCrawlerResultBuilder.getCrawlerResultAsBaseReport(result, maxDepth, targetLanguage);
+            return WebCrawlerReportBuilder.getCrawlerResultAsBaseReport(result, maxDepth, targetLanguage);
         } else {
-            return WebCrawlerResultBuilder.getCrawlerResultAsNestedReport(result);
+            return WebCrawlerReportBuilder.getCrawlerResultAsNestedReport(result);
         }
-    }
-
-    private boolean isUnvisitedValidLink(String url) {
-        return isValidURL(url);
     }
 
     public void setWebsiteService(WebsiteService websiteService) {
         this.websiteService = websiteService;
     }
 
-    public void setTranslator(TranslatorService translatorService) {
+    public void setTranslatorService(TranslatorService translatorService) {
         this.translatorService = translatorService;
     }
 

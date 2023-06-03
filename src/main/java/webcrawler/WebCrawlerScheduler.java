@@ -1,3 +1,5 @@
+package webcrawler;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -6,8 +8,8 @@ import java.util.concurrent.*;
 
 public class WebCrawlerScheduler {
 
-    private static final int timeoutForChildThreadsInMinutes = 10;
-    private static final int timeoutForShutdownInMinutes = 10;
+    public static int timeoutForChildThreadsInMinutes = 10;
+    public static int timeoutForShutdownInMinutes = 10;
 
     private static ExecutorService executorService;
 
@@ -17,9 +19,7 @@ public class WebCrawlerScheduler {
     private final Map<Future<String>, String> futuresWithUrls = new HashMap<>();
 
     public static void initializeThreadPoolWithThreadCount(int threadCount) {
-        if (executorService == null) {
-            executorService = Executors.newFixedThreadPool(threadCount);
-        }
+        executorService = Executors.newFixedThreadPool(threadCount);
     }
 
     public void submit(Callable<String> task, String url) {
@@ -51,13 +51,14 @@ public class WebCrawlerScheduler {
         return "Exception when waiting on child crawling url";
     }
 
-    public void shutdown() {
+    public boolean shutdown() {
         executorService.shutdown();
         try {
-            executorService.awaitTermination(timeoutForShutdownInMinutes, TimeUnit.MINUTES);
+            return executorService.awaitTermination(timeoutForShutdownInMinutes, TimeUnit.MINUTES);
         } catch (InterruptedException interruptedException) {
-            System.out.println("Exception when waiting for thread pool termination");
+            System.out.println("InterruptedException when waiting for thread pool termination");
             interruptedException.printStackTrace();
         }
+        return false;
     }
 }

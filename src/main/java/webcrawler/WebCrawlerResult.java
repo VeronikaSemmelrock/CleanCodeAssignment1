@@ -1,3 +1,7 @@
+package webcrawler;
+
+import websiteService.crawledDocument.Heading;
+
 import java.util.List;
 
 public class WebCrawlerResult {

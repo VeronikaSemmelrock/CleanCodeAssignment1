@@ -1,3 +1,5 @@
+package websiteService.crawledDocument;
+
 public class Heading {
 
     private String text;

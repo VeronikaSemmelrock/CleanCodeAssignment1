@@ -1,5 +1,9 @@
+package websiteService.httpConnector;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import websiteService.crawledDocument.CrawledDocument;
+import websiteService.crawledDocument.JsoupCrawledDocument;
 
 public class JsoupHttpConnector implements HttpConnector {
 
