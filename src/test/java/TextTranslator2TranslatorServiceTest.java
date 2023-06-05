@@ -75,7 +75,7 @@ public class TextTranslator2TranslatorServiceTest {
     @Test
     void translateTest_invalidInputNull() {
         assertThrows(
-                IllegalArgumentException.class,
+                TranslatorServiceException.class,
                 () -> textTranslator2Translator.translate(null, "german")
         );
     }
@@ -83,7 +83,7 @@ public class TextTranslator2TranslatorServiceTest {
     @Test
     void translateTest_invalidInputNotALanguage() {
         assertThrows(
-                IllegalArgumentException.class,
+                TranslatorServiceException.class,
                 () -> textTranslator2Translator.translate("Hello", "notALanguage")
         );
     }

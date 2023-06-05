@@ -138,7 +138,7 @@ class WebCrawlerTest {
         WebCrawlerScheduler.initializeThreadPoolWithThreadCount(10000);
         initFor3DepthMultipleUrlsTest();
 
-        webCrawler.run(List.of("https://www.aau.at", "https://www.aau.at", "https://www.aau.at"));
+        webCrawler.run(List.of("https://www.aau.at", "https://campusplan.aau.at/de/", "https://www.neromylos.com"));
 
         String outputFileContent = Files.readString(Path.of(OUTPUT_FILE_NAME));
 
@@ -156,10 +156,9 @@ class WebCrawlerTest {
         CrawledDocument rootWebsite = getCrawledDocument("rootWebsiteForCrawlTest.html");
         CrawledDocument nestedWebsite = getCrawledDocument("nestedWebsiteForCrawlTest.html");
 
-        Mockito.when(mockedWebsiteService.getWebsite(Mockito.anyString()))
-                .thenReturn(rootWebsite)    // Return the root website at the first invocation of websiteService.WebsiteService#getWebsite
-                .thenReturn(nestedWebsite)  // Return the nested website at the second invocation of websiteService.WebsiteService#getWebsite
-                .thenThrow(HttpConnectorException.class);   // Throw HttpConnectorException at the third invocation of websiteService.WebsiteService#getWebsite
+        Mockito.when(mockedWebsiteService.getWebsite("https://www.aau.at")).thenReturn(rootWebsite);
+        Mockito.when(mockedWebsiteService.getWebsite("https://campus.aau.at/")).thenReturn(nestedWebsite);
+        Mockito.when(mockedWebsiteService.getWebsite("https://www.google.at/")).thenThrow(HttpConnectorException.class);
     }
 
     private void initFor3DepthMultipleUrlsTest() throws IOException, TranslatorServiceException, HttpConnectorException {
@@ -217,374 +216,376 @@ class WebCrawlerTest {
     // WebsiteService is mocked so with each getWebsite call the same website is returned.
     // Expected result for test with max depth 3 and three times the same url is a nesting of the same website multiple times in correct order.
     private String getExpectedResultFor3DepthMultipleUrlsTest() {
-        return "input: <a>https://www.aau.at</a>\n" +
-                "<br>depth: 3\n" +
-                "<br>source language: de\n" +
-                "<br>target language: english\n" +
-                "<br>summary:\n" +
-                "# h1 Heading\n" +
-                "## h2 Heading\n" +
-                "### h3 Heading\n" +
-                "#### h4 Heading\n" +
-                "##### h5 Heading\n" +
-                "###### h6 Heading\n" +
-                "\n" +
-                "<br>--> link to <a>https://campus.aau.at/</a>\n" +
-                "#--> h1 Heading\n" +
-                "##--> h2 Heading\n" +
-                "###--> h3 Heading\n" +
-                "####--> h4 Heading\n" +
-                "#####--> h5 Heading\n" +
-                "######--> h6 Heading\n" +
-                "\n" +
-                "<br>----> link to <a>https://campus.aau.at/</a>\n" +
-                "#----> h1 Heading\n" +
-                "##----> h2 Heading\n" +
-                "###----> h3 Heading\n" +
-                "####----> h4 Heading\n" +
-                "#####----> h5 Heading\n" +
-                "######----> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://campus.aau.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://www.google.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>----> link to <a>https://www.google.at/</a>\n" +
-                "#----> h1 Heading\n" +
-                "##----> h2 Heading\n" +
-                "###----> h3 Heading\n" +
-                "####----> h4 Heading\n" +
-                "#####----> h5 Heading\n" +
-                "######----> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://campus.aau.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://www.google.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>--> link to <a>https://www.google.at/</a>\n" +
-                "#--> h1 Heading\n" +
-                "##--> h2 Heading\n" +
-                "###--> h3 Heading\n" +
-                "####--> h4 Heading\n" +
-                "#####--> h5 Heading\n" +
-                "######--> h6 Heading\n" +
-                "\n" +
-                "<br>----> link to <a>https://campus.aau.at/</a>\n" +
-                "#----> h1 Heading\n" +
-                "##----> h2 Heading\n" +
-                "###----> h3 Heading\n" +
-                "####----> h4 Heading\n" +
-                "#####----> h5 Heading\n" +
-                "######----> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://campus.aau.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://www.google.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>----> link to <a>https://www.google.at/</a>\n" +
-                "#----> h1 Heading\n" +
-                "##----> h2 Heading\n" +
-                "###----> h3 Heading\n" +
-                "####----> h4 Heading\n" +
-                "#####----> h5 Heading\n" +
-                "######----> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://campus.aau.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://www.google.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "input: <a>https://www.aau.at</a>\n" +
-                "<br>depth: 3\n" +
-                "<br>source language: de\n" +
-                "<br>target language: english\n" +
-                "<br>summary:\n" +
-                "# h1 Heading\n" +
-                "## h2 Heading\n" +
-                "### h3 Heading\n" +
-                "#### h4 Heading\n" +
-                "##### h5 Heading\n" +
-                "###### h6 Heading\n" +
-                "\n" +
-                "<br>--> link to <a>https://campus.aau.at/</a>\n" +
-                "#--> h1 Heading\n" +
-                "##--> h2 Heading\n" +
-                "###--> h3 Heading\n" +
-                "####--> h4 Heading\n" +
-                "#####--> h5 Heading\n" +
-                "######--> h6 Heading\n" +
-                "\n" +
-                "<br>----> link to <a>https://campus.aau.at/</a>\n" +
-                "#----> h1 Heading\n" +
-                "##----> h2 Heading\n" +
-                "###----> h3 Heading\n" +
-                "####----> h4 Heading\n" +
-                "#####----> h5 Heading\n" +
-                "######----> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://campus.aau.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://www.google.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>----> link to <a>https://www.google.at/</a>\n" +
-                "#----> h1 Heading\n" +
-                "##----> h2 Heading\n" +
-                "###----> h3 Heading\n" +
-                "####----> h4 Heading\n" +
-                "#####----> h5 Heading\n" +
-                "######----> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://campus.aau.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://www.google.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>--> link to <a>https://www.google.at/</a>\n" +
-                "#--> h1 Heading\n" +
-                "##--> h2 Heading\n" +
-                "###--> h3 Heading\n" +
-                "####--> h4 Heading\n" +
-                "#####--> h5 Heading\n" +
-                "######--> h6 Heading\n" +
-                "\n" +
-                "<br>----> link to <a>https://campus.aau.at/</a>\n" +
-                "#----> h1 Heading\n" +
-                "##----> h2 Heading\n" +
-                "###----> h3 Heading\n" +
-                "####----> h4 Heading\n" +
-                "#####----> h5 Heading\n" +
-                "######----> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://campus.aau.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://www.google.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>----> link to <a>https://www.google.at/</a>\n" +
-                "#----> h1 Heading\n" +
-                "##----> h2 Heading\n" +
-                "###----> h3 Heading\n" +
-                "####----> h4 Heading\n" +
-                "#####----> h5 Heading\n" +
-                "######----> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://campus.aau.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://www.google.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "input: <a>https://www.aau.at</a>\n" +
-                "<br>depth: 3\n" +
-                "<br>source language: de\n" +
-                "<br>target language: english\n" +
-                "<br>summary:\n" +
-                "# h1 Heading\n" +
-                "## h2 Heading\n" +
-                "### h3 Heading\n" +
-                "#### h4 Heading\n" +
-                "##### h5 Heading\n" +
-                "###### h6 Heading\n" +
-                "\n" +
-                "<br>--> link to <a>https://campus.aau.at/</a>\n" +
-                "#--> h1 Heading\n" +
-                "##--> h2 Heading\n" +
-                "###--> h3 Heading\n" +
-                "####--> h4 Heading\n" +
-                "#####--> h5 Heading\n" +
-                "######--> h6 Heading\n" +
-                "\n" +
-                "<br>----> link to <a>https://campus.aau.at/</a>\n" +
-                "#----> h1 Heading\n" +
-                "##----> h2 Heading\n" +
-                "###----> h3 Heading\n" +
-                "####----> h4 Heading\n" +
-                "#####----> h5 Heading\n" +
-                "######----> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://campus.aau.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://www.google.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>----> link to <a>https://www.google.at/</a>\n" +
-                "#----> h1 Heading\n" +
-                "##----> h2 Heading\n" +
-                "###----> h3 Heading\n" +
-                "####----> h4 Heading\n" +
-                "#####----> h5 Heading\n" +
-                "######----> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://campus.aau.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://www.google.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>--> link to <a>https://www.google.at/</a>\n" +
-                "#--> h1 Heading\n" +
-                "##--> h2 Heading\n" +
-                "###--> h3 Heading\n" +
-                "####--> h4 Heading\n" +
-                "#####--> h5 Heading\n" +
-                "######--> h6 Heading\n" +
-                "\n" +
-                "<br>----> link to <a>https://campus.aau.at/</a>\n" +
-                "#----> h1 Heading\n" +
-                "##----> h2 Heading\n" +
-                "###----> h3 Heading\n" +
-                "####----> h4 Heading\n" +
-                "#####----> h5 Heading\n" +
-                "######----> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://campus.aau.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://www.google.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>----> link to <a>https://www.google.at/</a>\n" +
-                "#----> h1 Heading\n" +
-                "##----> h2 Heading\n" +
-                "###----> h3 Heading\n" +
-                "####----> h4 Heading\n" +
-                "#####----> h5 Heading\n" +
-                "######----> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://campus.aau.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n" +
-                "\n" +
-                "<br>------> link to <a>https://www.google.at/</a>\n" +
-                "#------> h1 Heading\n" +
-                "##------> h2 Heading\n" +
-                "###------> h3 Heading\n" +
-                "####------> h4 Heading\n" +
-                "#####------> h5 Heading\n" +
-                "######------> h6 Heading\n";
+        return """
+                input: <a>https://www.aau.at</a>
+                <br>depth: 3
+                <br>source language: de
+                <br>target language: english
+                <br>summary:
+                # h1 Heading
+                ## h2 Heading
+                ### h3 Heading
+                #### h4 Heading
+                ##### h5 Heading
+                ###### h6 Heading
+
+                <br>--> link to <a>https://campus.aau.at/</a>
+                #--> h1 Heading
+                ##--> h2 Heading
+                ###--> h3 Heading
+                ####--> h4 Heading
+                #####--> h5 Heading
+                ######--> h6 Heading
+
+                <br>----> link to <a>https://campus.aau.at/</a>
+                #----> h1 Heading
+                ##----> h2 Heading
+                ###----> h3 Heading
+                ####----> h4 Heading
+                #####----> h5 Heading
+                ######----> h6 Heading
+
+                <br>------> link to <a>https://campus.aau.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>------> link to <a>https://www.google.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>----> link to <a>https://www.google.at/</a>
+                #----> h1 Heading
+                ##----> h2 Heading
+                ###----> h3 Heading
+                ####----> h4 Heading
+                #####----> h5 Heading
+                ######----> h6 Heading
+
+                <br>------> link to <a>https://campus.aau.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>------> link to <a>https://www.google.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>--> link to <a>https://www.google.at/</a>
+                #--> h1 Heading
+                ##--> h2 Heading
+                ###--> h3 Heading
+                ####--> h4 Heading
+                #####--> h5 Heading
+                ######--> h6 Heading
+
+                <br>----> link to <a>https://campus.aau.at/</a>
+                #----> h1 Heading
+                ##----> h2 Heading
+                ###----> h3 Heading
+                ####----> h4 Heading
+                #####----> h5 Heading
+                ######----> h6 Heading
+
+                <br>------> link to <a>https://campus.aau.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>------> link to <a>https://www.google.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>----> link to <a>https://www.google.at/</a>
+                #----> h1 Heading
+                ##----> h2 Heading
+                ###----> h3 Heading
+                ####----> h4 Heading
+                #####----> h5 Heading
+                ######----> h6 Heading
+
+                <br>------> link to <a>https://campus.aau.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>------> link to <a>https://www.google.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+                input: <a>https://campusplan.aau.at/de/</a>
+                <br>depth: 3
+                <br>source language: de
+                <br>target language: english
+                <br>summary:
+                # h1 Heading
+                ## h2 Heading
+                ### h3 Heading
+                #### h4 Heading
+                ##### h5 Heading
+                ###### h6 Heading
+
+                <br>--> link to <a>https://campus.aau.at/</a>
+                #--> h1 Heading
+                ##--> h2 Heading
+                ###--> h3 Heading
+                ####--> h4 Heading
+                #####--> h5 Heading
+                ######--> h6 Heading
+
+                <br>----> link to <a>https://campus.aau.at/</a>
+                #----> h1 Heading
+                ##----> h2 Heading
+                ###----> h3 Heading
+                ####----> h4 Heading
+                #####----> h5 Heading
+                ######----> h6 Heading
+
+                <br>------> link to <a>https://campus.aau.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>------> link to <a>https://www.google.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>----> link to <a>https://www.google.at/</a>
+                #----> h1 Heading
+                ##----> h2 Heading
+                ###----> h3 Heading
+                ####----> h4 Heading
+                #####----> h5 Heading
+                ######----> h6 Heading
+
+                <br>------> link to <a>https://campus.aau.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>------> link to <a>https://www.google.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>--> link to <a>https://www.google.at/</a>
+                #--> h1 Heading
+                ##--> h2 Heading
+                ###--> h3 Heading
+                ####--> h4 Heading
+                #####--> h5 Heading
+                ######--> h6 Heading
+
+                <br>----> link to <a>https://campus.aau.at/</a>
+                #----> h1 Heading
+                ##----> h2 Heading
+                ###----> h3 Heading
+                ####----> h4 Heading
+                #####----> h5 Heading
+                ######----> h6 Heading
+
+                <br>------> link to <a>https://campus.aau.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>------> link to <a>https://www.google.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>----> link to <a>https://www.google.at/</a>
+                #----> h1 Heading
+                ##----> h2 Heading
+                ###----> h3 Heading
+                ####----> h4 Heading
+                #####----> h5 Heading
+                ######----> h6 Heading
+
+                <br>------> link to <a>https://campus.aau.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>------> link to <a>https://www.google.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+                input: <a>https://www.neromylos.com</a>
+                <br>depth: 3
+                <br>source language: de
+                <br>target language: english
+                <br>summary:
+                # h1 Heading
+                ## h2 Heading
+                ### h3 Heading
+                #### h4 Heading
+                ##### h5 Heading
+                ###### h6 Heading
+
+                <br>--> link to <a>https://campus.aau.at/</a>
+                #--> h1 Heading
+                ##--> h2 Heading
+                ###--> h3 Heading
+                ####--> h4 Heading
+                #####--> h5 Heading
+                ######--> h6 Heading
+
+                <br>----> link to <a>https://campus.aau.at/</a>
+                #----> h1 Heading
+                ##----> h2 Heading
+                ###----> h3 Heading
+                ####----> h4 Heading
+                #####----> h5 Heading
+                ######----> h6 Heading
+
+                <br>------> link to <a>https://campus.aau.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>------> link to <a>https://www.google.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>----> link to <a>https://www.google.at/</a>
+                #----> h1 Heading
+                ##----> h2 Heading
+                ###----> h3 Heading
+                ####----> h4 Heading
+                #####----> h5 Heading
+                ######----> h6 Heading
+
+                <br>------> link to <a>https://campus.aau.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>------> link to <a>https://www.google.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>--> link to <a>https://www.google.at/</a>
+                #--> h1 Heading
+                ##--> h2 Heading
+                ###--> h3 Heading
+                ####--> h4 Heading
+                #####--> h5 Heading
+                ######--> h6 Heading
+
+                <br>----> link to <a>https://campus.aau.at/</a>
+                #----> h1 Heading
+                ##----> h2 Heading
+                ###----> h3 Heading
+                ####----> h4 Heading
+                #####----> h5 Heading
+                ######----> h6 Heading
+
+                <br>------> link to <a>https://campus.aau.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>------> link to <a>https://www.google.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>----> link to <a>https://www.google.at/</a>
+                #----> h1 Heading
+                ##----> h2 Heading
+                ###----> h3 Heading
+                ####----> h4 Heading
+                #####----> h5 Heading
+                ######----> h6 Heading
+
+                <br>------> link to <a>https://campus.aau.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+
+                <br>------> link to <a>https://www.google.at/</a>
+                #------> h1 Heading
+                ##------> h2 Heading
+                ###------> h3 Heading
+                ####------> h4 Heading
+                #####------> h5 Heading
+                ######------> h6 Heading
+                """;
     }
 }

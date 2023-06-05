@@ -10,7 +10,7 @@ import java.util.Map;
 public class TextTranslator2TranslatorService implements TranslatorService {
 
     private final static Map<String, String> languagesWithAbbreviations = createLanguagesWithAbbreviations();
-    private final static String KEY = "8add8089dfmsh39f77e11496092bp149c84jsn9c1e220cd5af";
+    private final static String KEY = "e8fef7c6e0mshfc66f325458218cp1d656cjsn56f6f32be12c";
     private OkHttpClient client = new OkHttpClient();
 
     private static Map<String, String> createLanguagesWithAbbreviations() {
@@ -77,20 +77,19 @@ public class TextTranslator2TranslatorService implements TranslatorService {
 
     @Override
     public String translate(String text, String targetLanguage) throws TranslatorServiceException {
-//        try {
-//            RequestBody requestBody = createTranslationRequestBody(text, targetLanguage);
-//            Request request = createTranslationRequest(requestBody);
-//            Response response = client.newCall(request).execute();
-//
-//            if (response.isSuccessful()) {
-//                return getTranslatedTextFromResponse(response);
-//            } else {
-//                throw new translatorService.TranslatorServiceException("Translation did not work!");
-//            }
-//        } catch (Exception e) {
-//            throw new translatorService.TranslatorServiceException("Translation did not work!");
-//        }
-        return text;
+        try {
+            RequestBody requestBody = createTranslationRequestBody(text, targetLanguage);
+            Request request = createTranslationRequest(requestBody);
+            Response response = client.newCall(request).execute();
+
+            if (response.isSuccessful()) {
+                return getTranslatedTextFromResponse(response);
+            } else {
+                throw new TranslatorServiceException("Translation did not work!");
+            }
+        } catch (Exception e) {
+            throw new TranslatorServiceException("Translation did not work!");
+        }
     }
 
     private String getTranslatedTextFromResponse(Response response) throws IOException {
