@@ -3,6 +3,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import websiteService.crawledDocument.Heading;
+import websiteService.crawledDocument.JsoupCrawledDocument;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,10 +18,10 @@ import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
-class WebsiteTest {
+class JsoupCrawledDocumentTest {
 
-    private static Website websiteWithLang;
-    private static Website websiteWithoutLang;
+    private static JsoupCrawledDocument websiteWithLang;
+    private static JsoupCrawledDocument websiteWithoutLang;
 
     private final static String FILE_PATH = "testfiles";
 
@@ -29,10 +31,10 @@ class WebsiteTest {
         websiteWithoutLang = getWebsite("websiteWithoutLang.html");
     }
 
-    private static Website getWebsite(String filename) throws IOException {
+    private static JsoupCrawledDocument getWebsite(String filename) throws IOException {
         String html = Files.readString(Path.of(FILE_PATH, filename));
         Document document = Jsoup.parse(html);
-        return new Website(document);
+        return new JsoupCrawledDocument(document);
     }
 
     @Test
@@ -51,13 +53,13 @@ class WebsiteTest {
         expectedLinks.add("https://www.aau.at/");
         expectedLinks.add("https://campus.aau.at/");
 
-        assertEquals(expectedLinks, websiteWithLang.getLinks());
+        assertIterableEquals(expectedLinks, websiteWithLang.getLinks());
     }
 
     @Test
     void getHeadingsTest() {
         List<String> expectedHtmlHeadings = IntStream.range(1, 7).mapToObj(this::getHtmlHeadingForTest).collect(Collectors.toList());
-        List<String> actualHtmlHeadings = websiteWithLang.getHeadings().stream().map(Element::toString).collect(Collectors.toList());
+        List<String> actualHtmlHeadings = websiteWithLang.getHeadings().stream().map(this::headingToHtmlHeadingString).collect(Collectors.toList());
 
         assertIterableEquals(expectedHtmlHeadings, actualHtmlHeadings);
     }
@@ -66,5 +68,9 @@ class WebsiteTest {
         Element element = new Element("h" + level);
         element.html(level + "");
         return element.toString();
+    }
+
+    private String headingToHtmlHeadingString(Heading heading) {
+        return "<h" + heading.getIndent() + ">" + heading.getText() + "</h" + heading.getIndent() + ">";
     }
 }

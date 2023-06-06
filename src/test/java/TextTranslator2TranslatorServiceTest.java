@@ -3,14 +3,16 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import translatorService.TextTranslator2TranslatorService;
+import translatorService.TranslatorServiceException;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TranslatorTest {
+public class TextTranslator2TranslatorServiceTest {
     private static OkHttpClient mockedClient;
-    private static Translator translator;
+    private static TextTranslator2TranslatorService textTranslator2Translator;
 
     private static Response mockedResponse;
     private static Call mockedCall;
@@ -19,8 +21,8 @@ public class TranslatorTest {
     @BeforeAll
     static void setUp() throws IOException {
         mockedClient = Mockito.mock(OkHttpClient.class);
-        translator = new Translator();
-        translator.setClient(mockedClient);
+        textTranslator2Translator = new TextTranslator2TranslatorService();
+        textTranslator2Translator.setClient(mockedClient);
         mockedResponse = Mockito.mock(Response.class);
         mockedCall = Mockito.mock(Call.class);
         mockedResponseBody = Mockito.mock(ResponseBody.class);
@@ -33,7 +35,7 @@ public class TranslatorTest {
     @AfterAll
     static void tearDown() {
         mockedClient = null;
-        translator = null;
+        textTranslator2Translator = null;
         mockedResponse = null;
         mockedCall = null;
         mockedResponseBody = null;
@@ -42,47 +44,47 @@ public class TranslatorTest {
 
     @Test
     void isValidLanguageTest_validInput() {
-        assertTrue(Translator.isValidLanguage("german"));
+        assertTrue(textTranslator2Translator.isValidLanguage("german"));
     }
 
     @Test
     void isValidLanguageTest_invalidInput() {
-        assertFalse(Translator.isValidLanguage("deutsch"));
+        assertFalse(textTranslator2Translator.isValidLanguage("deutsch"));
     }
 
     @Test
     void getAbbreviationOfLanguageTest_validInput() {
-        assertEquals("de", Translator.getAbbreviationOfLanguage("german"));
+        assertEquals("de", TextTranslator2TranslatorService.getAbbreviationOfLanguage("german"));
     }
 
     @Test
     void getAbbreviationOfLanguageTest_invalidInput() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> Translator.getAbbreviationOfLanguage("notALanguage")
+                () -> TextTranslator2TranslatorService.getAbbreviationOfLanguage("notALanguage")
         );
     }
 
     @Test
-    void translateTest_validInput() throws IOException, TranslatorAPINetworkException {
+    void translateTest_validInput() throws IOException, TranslatorServiceException {
         initForTranslateTest_validInput();
 
-        assertEquals("Good morning", translator.translate("Guten Morgen", "english"));
+        assertEquals("Good morning", textTranslator2Translator.translate("Guten Morgen", "english"));
     }
 
     @Test
     void translateTest_invalidInputNull() {
         assertThrows(
-                IllegalArgumentException.class,
-                () -> translator.translate(null, "german")
+                TranslatorServiceException.class,
+                () -> textTranslator2Translator.translate(null, "german")
         );
     }
 
     @Test
     void translateTest_invalidInputNotALanguage() {
         assertThrows(
-                IllegalArgumentException.class,
-                () -> translator.translate("Hello", "notALanguage")
+                TranslatorServiceException.class,
+                () -> textTranslator2Translator.translate("Hello", "notALanguage")
         );
     }
 
@@ -90,8 +92,8 @@ public class TranslatorTest {
     void translateTest_APIException() {
         initForTranslateTest_APIException();
         assertThrows(
-                TranslatorAPINetworkException.class,
-                () -> translator.translate("Hallo", "german")
+                TranslatorServiceException.class,
+                () -> textTranslator2Translator.translate("Hallo", "german")
         );
     }
 
