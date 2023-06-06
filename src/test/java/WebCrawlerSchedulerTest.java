@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class WebCrawlerSchedulerTest {
 
     private WebCrawlerScheduler webCrawlerScheduler;
+    private int twoMinutesInms = 120_000;
 
     @BeforeEach
     void init() {
@@ -29,8 +30,7 @@ class WebCrawlerSchedulerTest {
         webCrawlerScheduler.submit(() -> "Result1", "Url1");
         webCrawlerScheduler.submit(() -> "Result2", "Url2");
 
-        String result = webCrawlerScheduler.getResult();
-        assertEquals("Result1Result2", result);
+        assertEquals("Result1Result2", webCrawlerScheduler.getResult());
     }
 
     @Test
@@ -41,26 +41,21 @@ class WebCrawlerSchedulerTest {
             webCrawlerScheduler.submit(() -> String.valueOf(tuple.getKey() + tuple.getValue()), "Url1");
         }
 
-        String result = webCrawlerScheduler.getResult();
-        assertEquals("510275", result);
+        assertEquals("510275", webCrawlerScheduler.getResult());
     }
 
-    private List<Map.Entry<Integer, Integer>> intTuples() {
-        return List.of(Map.entry(1, 4), Map.entry(2, 8), Map.entry(1, 1), Map.entry(30, 45));
-    }
+
 
     @Test
     void timeoutWhenWaitingForChildTest() {
         WebCrawlerScheduler.timeoutForChildThreadsInMinutes = 1;
 
         webCrawlerScheduler.submit(() -> {
-            Thread.sleep(120_000);
+            Thread.sleep(twoMinutesInms);
             return "result";
         }, "url");
 
-        String result = webCrawlerScheduler.getResult();
-
-        assertEquals("url\nTimeoutException when waiting on child crawling url", result);
+        assertEquals("url\nTimeoutException when waiting on child crawling url", webCrawlerScheduler.getResult());
     }
 
     @Test
@@ -69,8 +64,7 @@ class WebCrawlerSchedulerTest {
             throw new Exception();
         }, "url");
 
-        String result = webCrawlerScheduler.getResult();
-        assertEquals("url\nExecutionException when waiting on child crawling url", result);
+        assertEquals("url\nExecutionException when waiting on child crawling url", webCrawlerScheduler.getResult());
     }
 
     @Test
@@ -78,7 +72,7 @@ class WebCrawlerSchedulerTest {
         WebCrawlerScheduler.timeoutForShutdownInMinutes = 1;
 
         webCrawlerScheduler.submit(() -> {
-            Thread.sleep(120_000);
+            Thread.sleep(twoMinutesInms);//
             return "result";
         }, "url");
 
@@ -88,5 +82,9 @@ class WebCrawlerSchedulerTest {
     @Test
     void validShutdownTest() {
         assertTrue(webCrawlerScheduler.shutdown());
+    }
+
+    private List<Map.Entry<Integer, Integer>> intTuples() {
+        return List.of(Map.entry(1, 4), Map.entry(2, 8), Map.entry(1, 1), Map.entry(30, 45));
     }
 }

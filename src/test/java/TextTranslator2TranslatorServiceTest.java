@@ -89,15 +89,15 @@ public class TextTranslator2TranslatorServiceTest {
     }
 
     @Test
-    void translateTest_APIException() {
-        initForTranslateTest_APIException();
+    void translateTest_TranslatorServiceException() {
+        initForTranslateTest_TranslatorServiceException();
         assertThrows(
                 TranslatorServiceException.class,
                 () -> textTranslator2Translator.translate("Hallo", "german")
         );
     }
 
-    private void initForTranslateTest_APIException() {
+    private void initForTranslateTest_TranslatorServiceException() {
         Mockito.when(mockedResponse.isSuccessful()).thenReturn(false);
     }
 

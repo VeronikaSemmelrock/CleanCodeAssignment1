@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class JsoupHttpConnectorTest {
 
     private JsoupHttpConnector jsoupHttpConnector;
+    private Document documentMock;
+    private Connection connectionMock;
 
     @BeforeEach
     void init() {
@@ -35,10 +37,7 @@ class JsoupHttpConnectorTest {
     @Test
     void successTest() {
         try (MockedStatic<Jsoup> mockedStatic = Mockito.mockStatic(Jsoup.class)) {
-            Document documentMock = Mockito.mock(Document.class);
-            Connection connectionMock = Mockito.mock(Connection.class);
-            Mockito.when(Jsoup.connect(Mockito.anyString())).thenReturn(connectionMock);
-            Mockito.when(connectionMock.get()).thenReturn(documentMock);
+            initForSuccessTest();
 
             assertEquals(documentMock, Jsoup.connect("url").get());
         } catch (IOException ioException) {
@@ -46,4 +45,10 @@ class JsoupHttpConnectorTest {
         }
     }
 
+    private void initForSuccessTest() throws IOException {
+        documentMock = Mockito.mock(Document.class);
+        connectionMock = Mockito.mock(Connection.class);
+        Mockito.when(Jsoup.connect(Mockito.anyString())).thenReturn(connectionMock);
+        Mockito.when(connectionMock.get()).thenReturn(documentMock);
+    }
 }

@@ -1,3 +1,4 @@
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,15 +21,15 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 class JsoupCrawledDocumentTest {
 
-    private static JsoupCrawledDocument websiteWithLang;
-    private static JsoupCrawledDocument websiteWithoutLang;
+    private static JsoupCrawledDocument websiteWithLanguage;
+    private static JsoupCrawledDocument websiteWithoutLanguage;
 
     private final static String FILE_PATH = "testfiles";
 
     @BeforeAll
     static void init() throws IOException {
-        websiteWithLang = getWebsite("websiteWithLang.html");
-        websiteWithoutLang = getWebsite("websiteWithoutLang.html");
+        websiteWithLanguage = getWebsite("websiteWithLang.html");
+        websiteWithoutLanguage = getWebsite("websiteWithoutLang.html");
     }
 
     private static JsoupCrawledDocument getWebsite(String filename) throws IOException {
@@ -39,27 +40,25 @@ class JsoupCrawledDocumentTest {
 
     @Test
     void getSourceLanguageTest() {
-        assertEquals("de", websiteWithLang.getSourceLanguage());
+        assertEquals("de", websiteWithLanguage.getSourceLanguage());
     }
 
     @Test
     void getSourceLanguageUnknownTest() {
-        assertEquals("undetectable", websiteWithoutLang.getSourceLanguage());
+        assertEquals("undetectable", websiteWithoutLanguage.getSourceLanguage());
     }
 
     @Test
     void getLinksTest() {
-        Set<String> expectedLinks = new HashSet<>();
-        expectedLinks.add("https://www.aau.at/");
-        expectedLinks.add("https://campus.aau.at/");
+        Set<String> expectedLinks = getExpectedLinks();
 
-        assertIterableEquals(expectedLinks, websiteWithLang.getLinks());
+        assertIterableEquals(expectedLinks, websiteWithLanguage.getLinks());
     }
 
     @Test
     void getHeadingsTest() {
         List<String> expectedHtmlHeadings = IntStream.range(1, 7).mapToObj(this::getHtmlHeadingForTest).collect(Collectors.toList());
-        List<String> actualHtmlHeadings = websiteWithLang.getHeadings().stream().map(this::headingToHtmlHeadingString).collect(Collectors.toList());
+        List<String> actualHtmlHeadings = websiteWithLanguage.getHeadings().stream().map(this::headingToHtmlHeadingString).collect(Collectors.toList());
 
         assertIterableEquals(expectedHtmlHeadings, actualHtmlHeadings);
     }
@@ -72,5 +71,11 @@ class JsoupCrawledDocumentTest {
 
     private String headingToHtmlHeadingString(Heading heading) {
         return "<h" + heading.getIndent() + ">" + heading.getText() + "</h" + heading.getIndent() + ">";
+    }
+    private Set<String> getExpectedLinks() {
+        Set<String> expectedLinks = new HashSet<>();
+        expectedLinks.add("https://www.aau.at/");
+        expectedLinks.add("https://campus.aau.at/");
+        return expectedLinks;
     }
 }

@@ -13,22 +13,26 @@ class WebsiteServiceTest {
     private WebsiteService websiteService;
     private HttpConnector httpConnectorMock;
 
+    private CrawledDocument crawledDocumentMock;
+
     @BeforeEach
     void init() {
         httpConnectorMock = Mockito.mock(HttpConnector.class);
         websiteService = new WebsiteService(httpConnectorMock);
+        crawledDocumentMock = Mockito.mock(CrawledDocument.class);
     }
 
     @Test
     void nullTest() throws HttpConnectorException {
         Mockito.when(httpConnectorMock.getDocument(Mockito.anyString())).thenReturn(null);
+
         assertNull(websiteService.getWebsite("url"));
     }
 
     @Test
     void successTest() throws HttpConnectorException {
-        CrawledDocument crawledDocumentMock = Mockito.mock(CrawledDocument.class);
         Mockito.when(httpConnectorMock.getDocument(Mockito.anyString())).thenReturn(crawledDocumentMock);
+
         assertEquals(crawledDocumentMock, websiteService.getWebsite("url"));
     }
 }

@@ -18,6 +18,8 @@ public class WebCrawlerScheduler {
 
     private final Map<Future<String>, String> futuresWithUrls = new HashMap<>();
 
+    //Initialization of a too small thread pool (like size 1) can cause deadlocks
+    //Parent threads would try to start child threads but no more threads would be available in the pool so the timeoutForChildThreadsInMinutes would be reached as no results are created.
     public static void initializeThreadPoolWithThreadCount(int threadCount) {
         executorService = Executors.newFixedThreadPool(threadCount);
     }

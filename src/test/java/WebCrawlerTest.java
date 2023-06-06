@@ -145,39 +145,6 @@ class WebCrawlerTest {
         assertEquals(getExpectedResultFor3DepthMultipleUrlsTest(), outputFileContent);
     }
 
-    private void initFor0DepthTest() throws IOException, HttpConnectorException {
-        CrawledDocument website = getCrawledDocument("rootWebsiteForCrawlTest.html");
-        Mockito.when(mockedWebsiteService.getWebsite(Mockito.anyString())).thenReturn(website);
-    }
-
-    private void initFor1DepthTest() throws IOException, TranslatorServiceException, HttpConnectorException {
-        init(1, "english");
-
-        CrawledDocument rootWebsite = getCrawledDocument("rootWebsiteForCrawlTest.html");
-        CrawledDocument nestedWebsite = getCrawledDocument("nestedWebsiteForCrawlTest.html");
-
-        Mockito.when(mockedWebsiteService.getWebsite("https://www.aau.at")).thenReturn(rootWebsite);
-        Mockito.when(mockedWebsiteService.getWebsite("https://campus.aau.at/")).thenReturn(nestedWebsite);
-        Mockito.when(mockedWebsiteService.getWebsite("https://www.google.at/")).thenThrow(HttpConnectorException.class);
-    }
-
-    private void initFor3DepthMultipleUrlsTest() throws IOException, TranslatorServiceException, HttpConnectorException {
-        init(3, "english");
-
-        CrawledDocument rootWebsite = getCrawledDocument("rootWebsiteForCrawlTest.html");
-        Mockito.when(mockedWebsiteService.getWebsite(Mockito.anyString())).thenReturn(rootWebsite);
-    }
-
-    private static CrawledDocument getCrawledDocument(String filename) throws IOException {
-        String html = Files.readString(Path.of(TEST_FILES_PATH, filename));
-        Document document = Jsoup.parse(html);
-        return new JsoupCrawledDocument(document);
-    }
-
-    private void initForRootIsDeadLinkTest() throws HttpConnectorException {
-        Mockito.when(mockedWebsiteService.getWebsite(Mockito.anyString())).thenThrow(HttpConnectorException.class);
-    }
-
     @Test
     void isValidUrl_invalidInput() {
         assertFalse(WebCrawler.isValidURL("neromylos.com"));    // Without https://
@@ -213,8 +180,40 @@ class WebCrawlerTest {
         Files.deleteIfExists(Path.of(OUTPUT_FILE_NAME));
     }
 
-    // WebsiteService is mocked so with each getWebsite call the same website is returned.
-    // Expected result for test with max depth 3 and three times the same url is a nesting of the same website multiple times in correct order.
+    private void initFor0DepthTest() throws IOException, HttpConnectorException {
+        CrawledDocument website = getCrawledDocument("rootWebsiteForCrawlTest.html");
+        Mockito.when(mockedWebsiteService.getWebsite(Mockito.anyString())).thenReturn(website);
+    }
+
+    private void initFor1DepthTest() throws IOException, TranslatorServiceException, HttpConnectorException {
+        init(1, "english");
+
+        CrawledDocument rootWebsite = getCrawledDocument("rootWebsiteForCrawlTest.html");
+        CrawledDocument nestedWebsite = getCrawledDocument("nestedWebsiteForCrawlTest.html");
+
+        Mockito.when(mockedWebsiteService.getWebsite("https://www.aau.at")).thenReturn(rootWebsite);
+        Mockito.when(mockedWebsiteService.getWebsite("https://campus.aau.at/")).thenReturn(nestedWebsite);
+        Mockito.when(mockedWebsiteService.getWebsite("https://www.google.at/")).thenThrow(HttpConnectorException.class);
+    }
+
+    private void initFor3DepthMultipleUrlsTest() throws IOException, TranslatorServiceException, HttpConnectorException {
+        init(3, "english");
+
+        CrawledDocument rootWebsite = getCrawledDocument("rootWebsiteForCrawlTest.html");
+        Mockito.when(mockedWebsiteService.getWebsite(Mockito.anyString())).thenReturn(rootWebsite);
+    }
+
+    private static CrawledDocument getCrawledDocument(String filename) throws IOException {
+        String html = Files.readString(Path.of(TEST_FILES_PATH, filename));
+        Document document = Jsoup.parse(html);
+        return new JsoupCrawledDocument(document);
+    }
+
+    private void initForRootIsDeadLinkTest() throws HttpConnectorException {
+        Mockito.when(mockedWebsiteService.getWebsite(Mockito.anyString())).thenThrow(HttpConnectorException.class);
+    }
+
+
     private String getExpectedResultFor3DepthMultipleUrlsTest() {
         return """
                 input: <a>https://www.aau.at</a>
